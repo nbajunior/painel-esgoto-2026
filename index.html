@@ -11,7 +11,7 @@
 :root{
   --bg:#EEF3F4; --surface:#FFFFFF; --ink:#13303A; --muted:#5B7480; --line:#D3DFE2; --line-strong:#B5C7CC;
   --water:#0E5A8A; --water-soft:#DCEAF3;
-  --gain:#17805F; --gain-soft:#DCF0E7; --loss:#B8403A; --loss-soft:#F6E1DF;
+  --gain:#17805F; --gain-soft:#DCF0E7; --loss:#B8403A; --loss-soft:#F6E1DF; --adj:#9FB5BD; --warn:#8A5A00; --warn-soft:#FBEBC8;
   --font:'Barlow',system-ui,'Segoe UI',Roboto,Arial,sans-serif;
   --num:'Barlow Semi Condensed','Barlow',system-ui,'Segoe UI',Arial,sans-serif;
   color-scheme:light;
@@ -20,7 +20,7 @@
   :root{
     --bg:#0E1C21; --surface:#14282F; --ink:#E2ECEE; --muted:#93AAB2; --line:#24404A; --line-strong:#33545F;
     --water:#62AADB; --water-soft:#163A4E;
-    --gain:#4CC395; --gain-soft:#163A2F; --loss:#EE7D74; --loss-soft:#422524;
+    --gain:#4CC395; --gain-soft:#163A2F; --loss:#EE7D74; --loss-soft:#422524; --adj:#557883; --warn:#F2C46B; --warn-soft:#3D3215;
     color-scheme:dark;
   }
 }
@@ -97,6 +97,14 @@ th.sortable:hover{color:var(--ink)}
 tr.sum td{font-weight:600;border-top:2px solid var(--line-strong)}
 td.base{color:var(--muted)}
 .spark{width:120px;height:28px;display:block}
+td.warn{background:var(--warn-soft);color:var(--warn)}
+td.chg-in{background:var(--gain-soft)}
+td.chg-out{background:var(--loss-soft)}
+.note{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:18px 0 0;padding:10px 14px;border-left:4px solid var(--warn);background:var(--warn-soft);border-radius:4px}
+.note span{color:var(--ink)}
+.keyline{font-size:13px;color:var(--muted);margin:0 0 8px}
+.keyline i{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid var(--line-strong);margin:0 6px 0 14px;vertical-align:-1px}
+.keyline i:first-child{margin-left:0}
 
 /* Consolidado */
 .cons-bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:12px}
@@ -195,6 +203,7 @@ td.base{color:var(--muted)}
       </div>
       <div class="stats" id="stats"></div>
     </div>
+    <div class="note" id="divNote" hidden><span id="divTxt"></span><button class="btn" id="btnDiv" type="button">Ver no consolidado</button></div>
 
     <h2 id="t1"></h2>
     <p class="lead" id="l1"></p>
@@ -204,8 +213,8 @@ td.base{color:var(--muted)}
     <p class="lead" id="lMes"></p>
     <div class="tbl-wrap" id="tblMes"></div>
 
-    <h2>Entradas e saídas por mês</h2>
-    <p class="lead">Aumentos e reduções somados matrícula a matrícula, comparando com o mês anterior. A linha é o saldo.</p>
+    <h2>De onde vem a variação de cada mês</h2>
+    <p class="lead" id="lMov"></p>
     <div class="panel chart" id="chartMov"></div>
 
     <h2>Por sub-categoria</h2>
@@ -225,13 +234,17 @@ td.base{color:var(--muted)}
       <label class="field">Movimento do esgoto
         <select id="cMov">
           <option value="all">Todas as matrículas</option>
-          <option value="entrou">Passou a pagar esgoto</option>
-          <option value="saiu">Deixou de pagar esgoto</option>
+          <option value="entrou_ano">Passou a pagar esgoto em 2026 (saldo do ano)</option>
+          <option value="saiu_ano">Deixou de pagar esgoto em 2026 (saldo do ano)</option>
+          <option value="entrou_mes">Passou a pagar em um mês</option>
+          <option value="saiu_mes">Deixou de pagar em um mês</option>
+          <option value="diverg">Economias de esgoto divergentes</option>
           <option value="aumentou">Aumentou economias de esgoto</option>
           <option value="reduziu">Reduziu economias de esgoto</option>
-          <option value="igual">Sem mudança</option>
+          <option value="igual">Economias de esgoto sem mudança</option>
         </select>
       </label>
+      <label class="field" id="cMesWrap" hidden>Mês <select id="cMes"></select></label>
       <label class="field">Ordenar
         <select id="cSort">
           <option value="mat">Matrícula</option>
@@ -245,6 +258,7 @@ td.base{color:var(--muted)}
       <span class="count">Colunas por referência</span>
       <div class="chips" id="chips"></div>
     </div>
+    <p class="keyline"><i style="background:var(--gain-soft)"></i>passou a pagar esgoto no mês<i style="background:var(--loss-soft)"></i>deixou de pagar esgoto no mês<i style="background:var(--warn-soft)"></i>economias de esgoto divergentes (passe o mouse para ver o motivo)</p>
     <p class="count" id="cCount"></p>
     <div class="tbl-wrap tall cons" id="tblCons"></div>
     <div class="pager">
@@ -643,6 +657,7 @@ function setData(d){
   const ord = new Int32Array(nM); for (let i = 0; i < nM; i++) ord[i] = i;
   const key = D.mats.map(s => { const n = Number(s); return isFinite(n) ? n : Infinity; });
   D.ordMat = ord.sort((a, b) => key[a] - key[b] || (D.mats[a] < D.mats[b] ? -1 : 1));
+  derive();
   fillSelect($('#fCid'), D.dict.cid, 'Todas'); fillSelect($('#fSub'), D.dict.sub, 'Todas');
   st.cid = -1; st.sub = -1; st.page = 0;
   const first = refLabel(D.refs[0]), last = refLabel(D.refs[D.refs.length - 1]);
@@ -663,20 +678,46 @@ function keepMask(){
   for (let m = 0; m < n; m++) k[m] = (st.cid < 0 || D.cid[m] === st.cid) && (st.sub < 0 || D.sub[m] === st.sub) ? 1 : 0;
   return k;
 }
-function series(k, A){
-  const nR = D.refs.length, P = D.present;
-  const stock = new Float64Array(nR), gain = new Float64Array(nR), loss = new Float64Array(nR);
+// Marca, para cada matrícula e referência, se o tipo de faturamento inclui esgoto e se há divergência de economias
+function derive(){
+  const nM = D.mats.length, nR = D.refs.length, L = nR - 1, N = nM * nR;
+  const esg = D.dict.tipo.map(t => /ESGOTO/.test(String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()));
+  D.hasE = new Uint8Array(N); D.div = new Uint8Array(N); D.divN = new Uint16Array(nM); D.yStat = new Uint8Array(nM);
+  for (let m = 0; m < nM; m++){
+    const b = m * nR;
+    for (let r = 0; r < nR; r++){
+      const j = b + r; if (!D.present[j]) continue;
+      const h = esg[D.tipo[j]] ? 1 : 0; D.hasE[j] = h;
+      if (h && D.qe[j] !== D.et[j]) D.div[j] = 1;          // esgoto faturado, mas economias de esgoto ≠ total
+      else if (!h && D.qe[j] > 0) D.div[j] = 2;            // economias de esgoto sem tipo com esgoto
+      if (D.div[j]) D.divN[m]++;
+    }
+    const h0 = D.hasE[b], hL = D.hasE[b + L];
+    D.yStat[m] = h0 && hL ? 1 : !h0 && hL ? 2 : h0 && !hL ? 3 : 0;
+  }
+}
+function flows(k, A){
+  const nR = D.refs.length, L = nR - 1, P = D.present, H = D.hasE, Q = D.qe;
+  const z = () => new Float64Array(nR);
+  const o = { stock: z(), inMat: z(), inVal: z(), outMat: z(), outVal: z(), divMat: z(), yIn: 0, yInEco: 0, yOut: 0, yOutEco: 0 };
   for (let m = 0, n = D.mats.length; m < n; m++){
     if (!k[m]) continue;
-    const b = m * nR; let prev = 0;
+    const b = m * nR;
     for (let r = 0; r < nR; r++){
-      const v = P[b + r] ? A[b + r] : 0;
-      stock[r] += v;
-      if (r){ const d = v - prev; if (d > 0) gain[r] += d; else if (d < 0) loss[r] += d; }
-      prev = v;
+      const j = b + r, v = P[j] ? A[j] : 0;
+      o.stock[r] += v;
+      if (D.div[j]) o.divMat[r]++;
+      if (r){
+        const h = H[j], p = H[j - 1];
+        if (h && !p){ o.inMat[r]++; o.inVal[r] += v; }
+        else if (!h && p){ o.outMat[r]++; o.outVal[r] += P[j - 1] ? A[j - 1] : 0; }
+      }
     }
+    const h0 = H[b], hL = H[b + L];
+    if (!h0 && hL){ o.yIn++; o.yInEco += Q[b + L]; }
+    else if (h0 && !hL){ o.yOut++; o.yOutEco += Q[b]; }
   }
-  return { stock, gain, loss };
+  return o;
 }
 function bySegment(k, seg, nSeg, A){
   const nR = D.refs.length, P = D.present, out = new Float64Array(nSeg * nR);
@@ -686,15 +727,6 @@ function bySegment(k, seg, nSeg, A){
     for (let r = 0; r < nR; r++) if (P[b + r]) out[s + r] += A[b + r];
   }
   return out;
-}
-function movers(k){
-  const nR = D.refs.length, L = nR - 1; let entrou = 0, saiu = 0;
-  for (let m = 0, n = D.mats.length; m < n; m++){
-    if (!k[m]) continue;
-    const q0 = D.present[m * nR] ? D.qe[m * nR] : 0, qL = D.present[m * nR + L] ? D.qe[m * nR + L] : 0;
-    if (q0 === 0 && qL > 0) entrou++; else if (q0 > 0 && qL === 0) saiu++;
-  }
-  return { entrou, saiu };
 }
 
 /* ---------- gráficos SVG ---------- */
@@ -714,36 +746,39 @@ function shortFmt(v, money){
   return s + pre + nf0.format(a);
 }
 function chart(el, labels, sets, opts){
-  // sets: [{type:'bar'|'line', values, color(fn|str), name, stack?}]
-  const W = 860, H = opts.h || 300, padL = opts.money ? 92 : 64, padR = 16, padT = 16, padB = 34;
-  const vals = []; sets.forEach(s => s.values.forEach(v => vals.push(v)));
-  if (opts.stacked){ /* barras empilhadas acima e abaixo de zero já ficam nos valores */ }
-  let min = Math.min(0, ...vals), max = Math.max(0, ...vals);
+  const W = 860, H = opts.h || 300, padL = opts.money ? 92 : 64, padR = 16, padT = 22, padB = 34;
+  const n = labels.length, bars = sets.filter(s => s.type === 'bar'), lines = sets.filter(s => s.type === 'line');
+  const vals = [0];
+  if (opts.stacked){
+    for (let i = 0; i < n; i++){ let p = 0, q = 0; bars.forEach(s => { const v = s.values[i] || 0; if (v > 0) p += v; else q += v; }); vals.push(p, q); }
+  } else bars.forEach(s => s.values.forEach(v => { if (v != null) vals.push(v); }));
+  lines.forEach(s => s.values.forEach(v => { if (v != null) vals.push(v); }));
+  let min = Math.min(...vals), max = Math.max(...vals);
   const ticks = niceTicks(min, max, 5); min = ticks[0]; max = ticks[ticks.length - 1];
   const y = v => padT + (max - v) / (max - min || 1) * (H - padT - padB);
-  const n = labels.length, bw = (W - padL - padR) / n, x = i => padL + bw * i + bw / 2;
+  const bw = (W - padL - padR) / n, x = i => padL + bw * i + bw / 2;
   let g = '';
   ticks.forEach(t => {
-    g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" ${t === 0 ? 'stroke-width="1.5" stroke="var(--line-strong)"' : ''}/>`;
+    g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="${t === 0 ? 'var(--line-strong)' : 'var(--line)'}" stroke-width="${t === 0 ? 1.5 : 1}"/>`;
     g += `<text x="${padL - 8}" y="${y(t) + 4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--num)">${shortFmt(t, opts.money)}</text>`;
   });
   labels.forEach((l, i) => { g += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="12.5" fill="var(--muted)" font-family="var(--num)">${l}</text>`; });
-  const bars = sets.filter(s => s.type === 'bar');
-  const bwi = Math.min(46, bw * (opts.stacked ? .55 : .55));
+  const bwi = Math.min(46, bw * .55), pos = new Float64Array(n), neg = new Float64Array(n);
   bars.forEach(s => {
     s.values.forEach((v, i) => {
       if (v == null || Math.abs(v) < 1e-9) return;
       const c = typeof s.color === 'function' ? s.color(v) : s.color;
-      const y0 = y(Math.max(0, v)), h = Math.abs(y(v) - y(0));
-      const tip = `${labels[i]}: ${s.name} ${opts.fmt(v)}`;
-      g += `<rect x="${x(i) - bwi / 2}" y="${y0}" width="${bwi}" height="${Math.max(1, h)}" rx="2" fill="${c}"><title>${esc(tip)}</title></rect>`;
+      let a = 0;
+      if (opts.stacked){ a = v > 0 ? pos[i] : neg[i]; if (v > 0) pos[i] += v; else neg[i] += v; }
+      const t = a + v, yTop = y(Math.max(a, t)), h = Math.abs(y(t) - y(a));
+      g += `<rect x="${x(i) - bwi / 2}" y="${yTop}" width="${bwi}" height="${Math.max(1, h)}" fill="${c}"><title>${esc(`${labels[i]}: ${s.name} ${opts.fmt(v)}`)}</title></rect>`;
       if (s.label){
-        const ly = v >= 0 ? y0 - 6 : y0 + h + 14;
+        const ly = v >= 0 ? yTop - 6 : yTop + h + 14;
         g += `<text x="${x(i)}" y="${ly}" text-anchor="middle" font-size="12" font-weight="600" fill="${c}" font-family="var(--num)">${esc(opts.lab(v))}</text>`;
       }
     });
   });
-  sets.filter(s => s.type === 'line').forEach(s => {
+  lines.forEach(s => {
     const pts = s.values.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean);
     if (pts.length) g += `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round"/>`;
     s.values.forEach((v, i) => { if (v == null) return; g += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="var(--surface)" stroke="${s.color}" stroke-width="2"><title>${esc(labels[i] + ': ' + s.name + ' ' + opts.fmt(v))}</title></circle>`; });
@@ -767,19 +802,24 @@ function spark(vals){
 function renderResumo(){
   const k = keepMask(), nR = D.refs.length, L = nR - 1, labels = D.refs.map(refLabel);
   const first = labels[0], last = labels[L];
-  const eco = series(k, D.qe), fat = series(k, D.fe), mv = movers(k);
+  const eco = flows(k, D.qe), fat = flows(k, D.fe);
   const netEco = eco.stock[L] - eco.stock[0], netFat = fat.stock[L] - fat.stock[0];
 
   const hb = $('#heroBig'); hb.textContent = signed(netEco, v => nf0.format(v)); hb.className = 'hero-big ' + cls(netEco);
   $('#heroLabel').textContent = netEco >= 0 ? 'economias de esgoto a mais em 2026' : 'economias de esgoto a menos em 2026';
   $('#heroSub').textContent = `Saldo de ${first} a ${last}: de ${nf0.format(eco.stock[0])} para ${nf0.format(eco.stock[L])} economias faturadas com esgoto.`;
   const pct = eco.stock[0] ? netEco / eco.stock[0] * 100 : 0;
+  const color = c => c === 'pos' ? 'color:var(--gain)' : c === 'neg' ? 'color:var(--loss)' : '';
   $('#stats').innerHTML = [
     [signed(netFat, v => brl0.format(v)), `faturamento de esgoto a ${netFat >= 0 ? 'mais' : 'menos'} por mês (${last} contra ${first})`, cls(netFat)],
     [signed(pct, v => nf1.format(v) + '%'), `variação sobre a base de ${first}`, cls(pct)],
-    [nf0.format(mv.entrou), `matrículas passaram a pagar esgoto`, ''],
-    [nf0.format(mv.saiu), `matrículas deixaram de pagar esgoto`, '']
-  ].map(([b, s, c]) => `<div class="stat"><b class="${c ? 'num ' : 'num'}" style="${c === 'pos' ? 'color:var(--gain)' : c === 'neg' ? 'color:var(--loss)' : ''}">${b}</b><span>${s}</span></div>`).join('');
+    [nf0.format(eco.yIn), `matrículas passaram de AGUA para AGUA E ESGOTO, com ${nf0.format(eco.yInEco)} economias em ${last}`, ''],
+    [nf0.format(eco.yOut), `matrículas voltaram para só AGUA, com ${nf0.format(eco.yOutEco)} economias em ${first}`, '']
+  ].map(([b, s, c]) => `<div class="stat"><b class="num" style="${color(c)}">${b}</b><span>${s}</span></div>`).join('');
+
+  const dL = eco.divMat[L], note = $('#divNote');
+  note.hidden = !dL;
+  if (dL) $('#divTxt').textContent = `${nf0.format(dL)} matrículas em ${last} têm economias de esgoto diferentes do total de economias, ou economias de esgoto sem faturamento de esgoto.`;
 
   const money = st.metric === 'fat', S = money ? fat : eco;
   const fmt = money ? (v => signed(v, x => brl.format(x))) : (v => signed(v, x => nf0.format(x)));
@@ -789,30 +829,45 @@ function renderResumo(){
   $('#t1').textContent = money ? 'Faturamento de esgoto: variação mês a mês' : 'Economias de esgoto: variação mês a mês';
   $('#l1').textContent = `Barras: diferença para o mês anterior. Linha: acumulado desde ${first}.`;
   const varM = labels.map((_, r) => r ? S.stock[r] - S.stock[r - 1] : null);
-  const acc = labels.map((_, r) => r ? S.stock[r] - S.stock[0] : 0);
+  const acc = labels.map((_, r) => S.stock[r] - S.stock[0]);
   chart($('#chartCombo'), labels, [
     { type: 'bar', name: 'Variação', values: varM, color: v => v >= 0 ? 'var(--gain)' : 'var(--loss)', label: true },
     { type: 'line', name: 'Acumulado', values: acc, color: 'var(--water)' }
   ], { money, fmt, lab, aria: 'Variação mensal e acumulado de ' + what,
        legend: [['var(--gain)', 'Aumento no mês'], ['var(--loss)', 'Redução no mês'], ['var(--water)', 'Acumulado desde ' + first]] });
 
+  const ins = [], outs = [], adj = [], net = [];
+  for (let r = 1; r < nR; r++){
+    const v = S.stock[r] - S.stock[r - 1];
+    ins.push(S.inVal[r]); outs.push(-S.outVal[r]); adj.push(v - S.inVal[r] + S.outVal[r]); net.push(v);
+  }
+  $('#lMov').textContent = money
+    ? 'Verde: faturamento de esgoto das matrículas que passaram de AGUA para AGUA E ESGOTO no mês. Vermelho: das que voltaram para só AGUA (valor do mês anterior). Cinza: variação de faturamento em quem já pagava esgoto. A linha é a variação total do mês.'
+    : 'Verde: economias de esgoto das matrículas que passaram de AGUA para AGUA E ESGOTO no mês. Vermelho: das que voltaram para só AGUA. Cinza: aumento ou redução de economias em quem já pagava esgoto. A linha é a variação total do mês.';
   chart($('#chartMov'), labels.slice(1), [
-    { type: 'bar', name: 'Entradas', values: [...S.gain].slice(1), color: 'var(--gain)' },
-    { type: 'bar', name: 'Saídas', values: [...S.loss].slice(1), color: 'var(--loss)' },
-    { type: 'line', name: 'Saldo', values: [...S.gain].slice(1).map((g, i) => g + S.loss[i + 1]), color: 'var(--water)' }
-  ], { money, fmt, lab, stacked: true, h: 240, aria: 'Entradas e saídas mensais de ' + what,
-       legend: [['var(--gain)', 'Entradas'], ['var(--loss)', 'Saídas'], ['var(--water)', 'Saldo']] });
+    { type: 'bar', name: 'Passaram a pagar', values: ins, color: 'var(--gain)' },
+    { type: 'bar', name: 'Deixaram de pagar', values: outs, color: 'var(--loss)' },
+    { type: 'bar', name: 'Ajuste em quem já pagava', values: adj, color: 'var(--adj)' },
+    { type: 'line', name: 'Variação total', values: net, color: 'var(--water)' }
+  ], { money, fmt, lab, stacked: true, h: 260, aria: 'Origem da variação mensal de ' + what,
+       legend: [['var(--gain)', 'Passaram a pagar esgoto'], ['var(--loss)', 'Deixaram de pagar esgoto'], ['var(--adj)', 'Ajuste em quem já pagava'], ['var(--water)', 'Variação total']] });
 
   // Tabela mês a mês
   const f = money ? (v => brl0.format(v)) : (v => nf0.format(v));
   const fs = money ? (v => signed(v, x => brl0.format(x))) : (v => signed(v, x => nf0.format(x)));
-  $('#lMes').textContent = money ? 'Faturamento bruto de esgoto, somado por referência.' : 'Economias faturadas com esgoto, somadas por referência.';
+  const fi = v => nf0.format(v);
+  $('#lMes').textContent = 'Passar a pagar ou deixar de pagar é medido pela troca do TIPO_FATURAMENTO entre AGUA e AGUA E ESGOTO, comparando com o mês anterior.';
+  const td = (v, f2) => `<td class="${cls(v)}">${f2(v)}</td>`;
   const rows = [
-    ['Total no mês', r => `<td>${f(S.stock[r])}</td>`],
-    ['Variação no mês', r => r ? `<td class="${cls(S.stock[r] - S.stock[r - 1])}">${fs(S.stock[r] - S.stock[r - 1])}</td>` : '<td class="base">base</td>'],
-    ['Entradas', r => r ? `<td class="${cls(S.gain[r])}">${fs(S.gain[r])}</td>` : '<td></td>'],
-    ['Saídas', r => r ? `<td class="${cls(S.loss[r])}">${fs(S.loss[r])}</td>` : '<td></td>'],
-    ['Acumulado desde ' + first, r => r ? `<td class="${cls(S.stock[r] - S.stock[0])}">${fs(S.stock[r] - S.stock[0])}</td>` : '<td></td>']
+    [money ? 'Faturamento de esgoto no mês' : 'Economias de esgoto no mês', r => `<td>${f(S.stock[r])}</td>`],
+    ['Variação no mês', r => r ? td(S.stock[r] - S.stock[r - 1], fs) : '<td class="base">base</td>'],
+    ['Matrículas que passaram a pagar', r => r ? `<td>${fi(eco.inMat[r])}</td>` : '<td></td>'],
+    [money ? 'Faturamento de quem passou a pagar' : 'Economias de quem passou a pagar', r => r ? td(S.inVal[r], fs) : '<td></td>'],
+    ['Matrículas que deixaram de pagar', r => r ? `<td>${fi(eco.outMat[r])}</td>` : '<td></td>'],
+    [money ? 'Faturamento de quem deixou de pagar' : 'Economias de quem deixou de pagar', r => r ? td(-S.outVal[r], fs) : '<td></td>'],
+    ['Ajuste em quem já pagava', r => r ? td(S.stock[r] - S.stock[r - 1] - S.inVal[r] + S.outVal[r], fs) : '<td></td>'],
+    ['Acumulado desde ' + first, r => r ? td(S.stock[r] - S.stock[0], fs) : '<td></td>'],
+    ['Matrículas com divergência', r => `<td class="${eco.divMat[r] ? 'warn' : ''}">${fi(eco.divMat[r])}</td>`]
   ];
   $('#tblMes').innerHTML = `<table><thead><tr><th></th>${labels.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>` +
     rows.map(([n, fn]) => `<tr><td>${n}</td>${labels.map((_, r) => fn(r)).join('')}</tr>`).join('') + '</tbody></table>';
@@ -820,62 +875,99 @@ function renderResumo(){
   const A = money ? D.fe : D.qe;
   segTable($('#tblSub'), k, D.sub, D.dict.sub, A, money, 'Sub-categoria', 'sortSub');
   segTable($('#tblCid'), k, D.cid, D.dict.cid, A, money, 'Cidade', 'sortCid');
-  const txt = `Base em ${first}, variação de cada mês contra o anterior e total de 2026 (${last} menos ${first}).`;
+  const txt = `Base em ${first}, variação de cada mês contra o anterior e total de 2026 (${last} menos ${first}). Passaram e deixaram: matrículas que trocaram de tipo de faturamento entre ${first} e ${last}.`;
   $('#lSub').textContent = txt; $('#lCid').textContent = txt + ' Clique nos títulos para ordenar.';
   const s = D.stats;
   $('#foot').textContent = `Base: ${nf0.format(s.linhas)} linhas com ULTIMO_CONTRATO = SIM em ${s.abas.length} aba(s). ` +
-    `${nf0.format(s.naoUltimo)} linhas de contratos anteriores foram desconsideradas.` +
+    `${nf0.format(s.naoUltimo)} linhas de contratos anteriores foram desconsideradas. Matrícula ausente em uma referência conta como sem esgoto naquele mês.` +
     (s.semRef ? ` ${nf0.format(s.semRef)} linhas sem referência válida foram ignoradas.` : '') +
     (s.ignoradas.length ? ` Abas sem a coluna NUM_LIGACAO, ignoradas: ${s.ignoradas.join(', ')}.` : '');
 }
 function segTable(el, k, seg, names, A, money, title, sortKey){
   const nR = D.refs.length, L = nR - 1, labels = D.refs.map(refLabel), nS = names.length;
   const T = bySegment(k, seg, nS, A);
-  const used = new Uint8Array(nS); for (let m = 0; m < D.mats.length; m++) if (k[m]) used[seg[m]] = 1;
+  const used = new Uint8Array(nS), yIn = new Float64Array(nS), yOut = new Float64Array(nS);
+  for (let m = 0; m < D.mats.length; m++){
+    if (!k[m]) continue;
+    const s = seg[m]; used[s] = 1;
+    if (D.yStat[m] === 2) yIn[s]++; else if (D.yStat[m] === 3) yOut[s]++;
+  }
   let rows = []; for (let s = 0; s < nS; s++) if (used[s]) rows.push(s);
   const tot = s => T[s * nR + L] - T[s * nR];
   const sk = st[sortKey] || 'tot';
-  rows.sort(sk === 'nome' ? ((a, b) => names[a].localeCompare(names[b], 'pt-BR')) : sk === 'base' ? ((a, b) => T[b * nR] - T[a * nR]) : ((a, b) => tot(b) - tot(a)));
+  const sorters = {
+    nome: (a, b) => names[a].localeCompare(names[b], 'pt-BR'),
+    base: (a, b) => T[b * nR] - T[a * nR],
+    tot: (a, b) => tot(b) - tot(a),
+    in: (a, b) => yIn[b] - yIn[a],
+    out: (a, b) => yOut[b] - yOut[a]
+  };
+  rows.sort(sorters[sk] || sorters.tot);
   const f = money ? (v => brl0.format(v)) : (v => nf0.format(v));
   const fs = money ? (v => signed(v, x => brl0.format(x))) : (v => signed(v, x => nf0.format(x)));
-  const sum = new Float64Array(nR); rows.forEach(s => { for (let r = 0; r < nR; r++) sum[r] += T[s * nR + r]; });
-  const line = (name, get, isSum) => {
+  const sum = new Float64Array(nR); let sIn = 0, sOut = 0;
+  rows.forEach(s => { for (let r = 0; r < nR; r++) sum[r] += T[s * nR + r]; sIn += yIn[s]; sOut += yOut[s]; });
+  const line = (name, get, a, b, isSum) => {
     let h = `<tr${isSum ? ' class="sum"' : ''}><td>${esc(name)}</td><td class="base">${f(get(0))}</td>`;
     const vs = [];
     for (let r = 1; r < nR; r++){ const v = get(r) - get(r - 1); vs.push(v); h += `<td class="${cls(v)}">${fs(v)}</td>`; }
     const t = get(L) - get(0);
-    return h + `<td class="tot ${cls(t)}">${fs(t)}</td><td>${spark(vs)}</td></tr>`;
+    return h + `<td class="tot ${cls(t)}">${fs(t)}</td><td>${nf0.format(a)}</td><td>${nf0.format(b)}</td><td>${spark(vs)}</td></tr>`;
   };
-  el.innerHTML = `<table><thead><tr>
-      <th class="sortable" data-sort="nome" data-key="${sortKey}">${title}</th>
-      <th class="sortable" data-sort="base" data-key="${sortKey}">${labels[0]} (base)</th>
+  const th = (key, text, extra) => `<th class="sortable${extra ? ' ' + extra : ''}" data-sort="${key}" data-key="${sortKey}">${text}</th>`;
+  el.innerHTML = `<table><thead><tr>${th('nome', title)}${th('base', labels[0] + ' (base)')}
       ${labels.slice(1).map(l => `<th>${l}</th>`).join('')}
-      <th class="tot sortable" data-sort="tot" data-key="${sortKey}">Total 2026</th><th>Tendência</th></tr></thead><tbody>` +
-    rows.map(s => line(names[s] || '(vazio)', r => T[s * nR + r])).join('') +
-    line('Total', r => sum[r], true) + '</tbody></table>';
+      ${th('tot', 'Total 2026', 'tot')}${th('in', 'Passaram')}${th('out', 'Deixaram')}<th>Tendência</th></tr></thead><tbody>` +
+    rows.map(s => line(names[s] || '(vazio)', r => T[s * nR + r], yIn[s], yOut[s])).join('') +
+    line('Total', r => sum[r], sIn, sOut, true) + '</tbody></table>';
 }
 
 /* ---------- Consolidado ---------- */
+const YSTAT = ['Sem esgoto', 'Manteve esgoto', 'Passou a pagar', 'Deixou de pagar'];
+const YCLS = ['', '', 'pos', 'neg'];
 function buildChips(){
   $('#chips').innerHTML = FIELDS.map(f => `<button type="button" class="chip" data-f="${f.k}" aria-pressed="${visible.has(f.k)}">${f.l}</button>`).join('');
+}
+function fillMes(){
+  const mov = $('#cMov').value, wrap = $('#cMesWrap'), sel = $('#cMes');
+  const show = mov === 'entrou_mes' || mov === 'saiu_mes' || mov === 'diverg';
+  wrap.hidden = !show; if (!show) return;
+  const prev = sel.value, from = mov === 'diverg' ? 0 : 1;
+  sel.innerHTML = '<option value="-1">Qualquer mês</option>' + D.refs.slice(from).map((k, i) => `<option value="${i + from}">${refLabel(k)}</option>`).join('');
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+function changed(m, dir, r){
+  const j = m * D.refs.length + r, h = D.hasE[j], p = D.hasE[j - 1];
+  return dir ? (h && !p) : (!h && p);
+}
+function changeMonths(m, dir){
+  const out = []; for (let r = 1; r < D.refs.length; r++) if (changed(m, dir, r)) out.push(refLabel(D.refs[r]));
+  return out;
 }
 function consList(){
   const k = keepMask(), nR = D.refs.length, L = nR - 1;
   const q = $('#cSearch').value.trim(), qU = q.toUpperCase(), mov = $('#cMov').value, sort = $('#cSort').value;
+  const mes = $('#cMesWrap').hidden ? -1 : +$('#cMes').value;
   const digits = /^\d+$/.test(q);
-  const out = [];
-  const delta = new Float64Array(D.mats.length);
+  const out = [], delta = new Float64Array(D.mats.length);
+  const any = (m, dir) => { if (mes > 0) return changed(m, dir, mes); for (let r = 1; r < nR; r++) if (changed(m, dir, r)) return true; return false; };
   for (const m of D.ordMat){
     if (!k[m]) continue;
     if (q && !(digits ? D.mats[m].includes(q) : D.nomes[m].toUpperCase().includes(qU))) continue;
-    const q0 = D.present[m * nR] ? D.qe[m * nR] : 0, qL = D.present[m * nR + L] ? D.qe[m * nR + L] : 0;
+    const q0 = D.qe[m * nR], qL = D.qe[m * nR + L];
     delta[m] = qL - q0;
-    if (mov === 'entrou' && !(q0 === 0 && qL > 0)) continue;
-    if (mov === 'saiu' && !(q0 > 0 && qL === 0)) continue;
-    if (mov === 'aumentou' && !(qL > q0)) continue;
-    if (mov === 'reduziu' && !(qL < q0)) continue;
-    if (mov === 'igual' && qL !== q0) continue;
-    out.push(m);
+    let ok = true;
+    switch (mov){
+      case 'entrou_ano': ok = D.yStat[m] === 2; break;
+      case 'saiu_ano': ok = D.yStat[m] === 3; break;
+      case 'entrou_mes': ok = any(m, 1); break;
+      case 'saiu_mes': ok = any(m, 0); break;
+      case 'diverg': ok = mes < 0 ? D.divN[m] > 0 : D.div[m * nR + mes] > 0; break;
+      case 'aumentou': ok = qL > q0; break;
+      case 'reduziu': ok = qL < q0; break;
+      case 'igual': ok = qL === q0; break;
+    }
+    if (ok) out.push(m);
   }
   if (sort === 'mais') out.sort((a, b) => delta[b] - delta[a]);
   else if (sort === 'menos') out.sort((a, b) => delta[a] - delta[b]);
@@ -891,7 +983,9 @@ function cellVal(f, j, forCsv){
     default: return forCsv ? String(D[f][j]) : nf0.format(D[f][j]);
   }
 }
+const DIVMSG = ['', 'Economias de esgoto diferentes do total de economias', 'Economias de esgoto sem faturamento de esgoto'];
 const PAGE = 100;
+const FIXED = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO', 'Esgoto em 2026'];
 function renderCons(recalc){
   if (recalc || !st.list) { st.list = consList(); st.page = 0; }
   const list = st.list, nR = D.refs.length, labels = D.refs.map(refLabel);
@@ -901,8 +995,7 @@ function renderCons(recalc){
   $('#cCount').textContent = `${nf0.format(list.length)} matrículas`;
   $('#pInfo').textContent = `Página ${st.page + 1} de ${nf0.format(pages)}`;
   $('#pPrev').disabled = st.page === 0; $('#pNext').disabled = st.page >= pages - 1;
-  const fixed = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO'];
-  let h = '<table><thead><tr>' + fixed.map((t, i) => `<th class="txt${i === 1 ? ' c2' : ''}" rowspan="2">${t}</th>`).join('');
+  let h = '<table><thead><tr>' + FIXED.map((t, i) => `<th class="txt${i === 1 ? ' c2' : ''}" rowspan="2">${t}</th>`).join('');
   if (fl.length) labels.forEach(l => { h += `<th class="grp" colspan="${fl.length}">${l}</th>`; });
   h += '</tr><tr>';
   labels.forEach(() => fl.forEach((f, i) => { h += `<th class="${i === 0 ? 'gs' : ''}${f.k === 'tipo' || f.k === 'ult' ? ' txt' : ''}">${f.l}</th>`; }));
@@ -910,18 +1003,25 @@ function renderCons(recalc){
   const start = st.page * PAGE, end = Math.min(list.length, start + PAGE);
   for (let i = start; i < end; i++){
     const m = list[i];
-    h += `<tr><td class="txt">${esc(D.mats[m])}</td><td class="txt c2">${esc(D.nomes[m])}</td><td class="txt">${esc(D.dict.cid[D.cid[m]])}</td><td class="txt">${esc(D.dict.sub[D.sub[m]])}</td><td class="txt">${esc(D.dict.sl[D.sl[m]])}</td><td class="txt">${esc(D.dict.sc[D.sc[m]])}</td>`;
+    h += `<tr><td class="txt">${esc(D.mats[m])}</td><td class="txt c2">${esc(D.nomes[m])}</td><td class="txt">${esc(D.dict.cid[D.cid[m]])}</td><td class="txt">${esc(D.dict.sub[D.sub[m]])}</td><td class="txt">${esc(D.dict.sl[D.sl[m]])}</td><td class="txt">${esc(D.dict.sc[D.sc[m]])}</td><td class="txt ${YCLS[D.yStat[m]]}">${YSTAT[D.yStat[m]]}</td>`;
     for (let r = 0; r < nR; r++){
       const j = m * nR + r;
-      fl.forEach((f, fi) => { h += `<td class="${fi === 0 ? 'gs' : ''}${f.k === 'tipo' || f.k === 'ult' ? ' txt' : ''}">${esc(cellVal(f.k, j))}</td>`; });
+      fl.forEach((f, fi) => {
+        let c = (fi === 0 ? 'gs' : '') + (f.k === 'tipo' || f.k === 'ult' ? ' txt' : ''), tip = '';
+        if (f.k === 'tipo' && r){
+          if (changed(m, 1, r)){ c += ' chg-in'; tip = 'Passou a pagar esgoto neste mês'; }
+          else if (changed(m, 0, r)){ c += ' chg-out'; tip = 'Deixou de pagar esgoto neste mês'; }
+        }
+        if ((f.k === 'qe' || f.k === 'et') && D.div[j]){ c += ' warn'; tip = DIVMSG[D.div[j]]; }
+        h += `<td class="${c}"${tip ? ` title="${tip}"` : ''}>${esc(cellVal(f.k, j))}</td>`;
+      });
     }
     h += '</tr>';
   }
-  if (!list.length) h += `<tr><td class="txt" colspan="${6 + fl.length * nR}">Nenhuma matrícula com esses filtros.</td></tr>`;
+  if (!list.length) h += `<tr><td class="txt" colspan="${FIXED.length + fl.length * nR}">Nenhuma matrícula com esses filtros.</td></tr>`;
   h += '</tbody></table>';
   const wrap = $('#tblCons'); wrap.innerHTML = h;
   const c1 = wrap.querySelector('thead th'); if (c1) wrap.style.setProperty('--c1w', c1.getBoundingClientRect().width + 'px');
-  // mantém a 2ª linha do cabeçalho logo abaixo da 1ª
   const r1 = wrap.querySelector('thead tr:first-child th.grp');
   if (r1) wrap.querySelectorAll('thead tr:nth-child(2) th').forEach(th => { th.style.top = r1.getBoundingClientRect().height + 'px'; });
 }
@@ -930,15 +1030,21 @@ async function exportCsv(){
   if (!list.length){ toast('Não há matrículas para exportar com esses filtros.'); return; }
   overlay(true, 'Gerando o CSV', `${nf0.format(list.length)} matrículas`, 0);
   const q = s => { s = String(s); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
-  const head = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO'];
+  const head = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO', 'ESGOTO_2026'];
   labels.forEach(l => FIELDS.forEach(f => head.push(`${f.h} ${l}`)));
+  head.push('MESES_PASSOU_A_PAGAR', 'MESES_DEIXOU_DE_PAGAR', 'MESES_COM_DIVERGENCIA');
   const parts = ['\ufeff' + head.join(';') + '\r\n'];
   for (let i = 0; i < list.length; i += 5000){
     let chunk = '';
     for (let x = i; x < Math.min(list.length, i + 5000); x++){
       const m = list[x];
-      const row = [D.mats[m], D.nomes[m], D.dict.cid[D.cid[m]], D.dict.sub[D.sub[m]], D.dict.sl[D.sl[m]], D.dict.sc[D.sc[m]]].map(q);
-      for (let r = 0; r < nR; r++) FIELDS.forEach(f => row.push(q(cellVal(f.k, m * nR + r, true))));
+      const row = [D.mats[m], D.nomes[m], D.dict.cid[D.cid[m]], D.dict.sub[D.sub[m]], D.dict.sl[D.sl[m]], D.dict.sc[D.sc[m]], YSTAT[D.yStat[m]]].map(q);
+      const dv = [];
+      for (let r = 0; r < nR; r++){
+        FIELDS.forEach(f => row.push(q(cellVal(f.k, m * nR + r, true))));
+        if (D.div[m * nR + r]) dv.push(labels[r]);
+      }
+      row.push(q(changeMonths(m, 1).join(', ')), q(changeMonths(m, 0).join(', ')), q(dv.join(', ')));
       chunk += row.join(';') + '\r\n';
     }
     parts.push(chunk);
@@ -988,7 +1094,9 @@ $('#chips').onclick = e => {
   c.setAttribute('aria-pressed', String(visible.has(f))); renderCons(false);
 };
 let tSearch; $('#cSearch').oninput = () => { clearTimeout(tSearch); tSearch = setTimeout(() => renderCons(true), 250); };
-$('#cMov').onchange = () => renderCons(true);
+$('#cMov').onchange = () => { fillMes(); renderCons(true); };
+$('#cMes').onchange = () => renderCons(true);
+$('#btnDiv').onclick = () => { $('#cMov').value = 'diverg'; fillMes(); $('#cMes').value = String(D.refs.length - 1); showTab('cons'); };
 $('#cSort').onchange = () => renderCons(true);
 $('#pPrev').onclick = () => { st.page--; renderCons(false); $('#tblCons').scrollTop = 0; };
 $('#pNext').onclick = () => { st.page++; renderCons(false); $('#tblCons').scrollTop = 0; };
