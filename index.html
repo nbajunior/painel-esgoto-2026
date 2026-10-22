@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Economias de esgoto 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F4; --surface:#FFFFFF; --ink:#13303A; --muted:#5B7480; --line:#D3DFE2; --line-strong:#B5C7CC;
+  --water:#0E5A8A; --water-soft:#DCEAF3;
+  --gain:#17805F; --gain-soft:#DCF0E7; --loss:#B8403A; --loss-soft:#F6E1DF;
+  --font:'Barlow',system-ui,'Segoe UI',Roboto,Arial,sans-serif;
+  --num:'Barlow Semi Condensed','Barlow',system-ui,'Segoe UI',Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0E1C21; --surface:#14282F; --ink:#E2ECEE; --muted:#93AAB2; --line:#24404A; --line-strong:#33545F;
+    --water:#62AADB; --water-soft:#163A4E;
+    --gain:#4CC395; --gain-soft:#163A2F; --loss:#EE7D74; --loss-soft:#422524;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+
+/* Cabeçalho */
+.top{background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1400px;margin:0 auto;padding:18px 24px 0;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.brand h1{margin:0;font-family:var(--num);font-weight:700;font-size:26px;letter-spacing:-.01em}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line-strong);background:var(--surface);padding:7px 14px;border-radius:6px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--water)}
+.btn.primary{background:var(--water);border-color:var(--water);color:#fff}
+@media (prefers-color-scheme: dark){.btn.primary{color:#0E1C21}}
+.btn.quiet{border-color:transparent;color:var(--muted)}
+.btn.quiet:hover{color:var(--loss);border-color:transparent}
+.tabs{max-width:1400px;margin:0 auto;padding:14px 24px 0;display:flex;gap:4px}
+.tab{border:0;background:none;padding:10px 16px 12px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:3px solid transparent}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--water)}
+
+/* Barra de filtros */
+.filters{max-width:1400px;margin:0 auto;padding:16px 24px 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.field{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.field select,.field input{background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px;min-width:160px}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 14px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--water-soft);color:var(--ink);font-weight:600}
+
+main{max-width:1400px;margin:0 auto;padding:20px 24px 60px}
+[hidden]{display:none !important}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);gap:32px;align-items:end;padding:8px 0 24px;border-bottom:1px solid var(--line)}
+.hero-big{font-family:var(--num);font-weight:700;font-size:clamp(56px,9vw,104px);line-height:.9;letter-spacing:-.02em}
+.hero-big.pos{color:var(--gain)} .hero-big.neg{color:var(--loss)}
+.hero-label{font-size:19px;font-weight:600;margin-top:10px}
+.hero-sub{color:var(--muted);margin-top:4px;max-width:46ch}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-left:1px solid var(--line)}
+.stat{padding:8px 22px}
+.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
+.stat b{display:block;font-family:var(--num);font-size:28px;font-weight:600;line-height:1.1}
+.stat span{color:var(--muted);font-size:13.5px}
+
+h2{font-family:var(--num);font-size:21px;font-weight:600;margin:32px 0 4px}
+.lead{color:var(--muted);margin:0 0 14px;font-size:14px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+/* Tabelas */
+.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.tbl-wrap.tall{max-height:560px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+th,td{padding:7px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);background:var(--surface);position:sticky;top:0;z-index:2}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+th:first-child{z-index:3}
+td{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:15px}
+td:first-child{font-family:var(--font);font-size:14px}
+tr:last-child td{border-bottom:0}
+td.pos{color:var(--gain)} td.neg{color:var(--loss)}
+td.tot{font-weight:700;background:var(--water-soft)}
+th.tot{color:var(--ink)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--ink)}
+tr.sum td{font-weight:600;border-top:2px solid var(--line-strong)}
+td.base{color:var(--muted)}
+.spark{width:120px;height:28px;display:block}
+
+/* Consolidado */
+.cons-bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:3px 11px;font-size:13px;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--water-soft);border-color:var(--water);color:var(--ink)}
+.cons th,.cons td{font-size:13px;padding:5px 10px}
+.cons td{font-size:14px}
+.cons thead tr:first-child th{top:0} .cons thead tr:nth-child(2) th{top:31px}
+.cons th.grp{text-align:left;color:var(--ink);border-left:1px solid var(--line-strong)}
+.cons td.gs,.cons th.gs{border-left:1px solid var(--line-strong)}
+.cons td.txt,.cons th.txt{text-align:left;font-family:var(--font)}
+.cons .c2{position:sticky;left:var(--c1w,100px);background:var(--surface);z-index:1;text-align:left;font-family:var(--font);border-right:1px solid var(--line-strong)}
+.cons thead th.c2{z-index:3}
+.cons thead tr:nth-child(2) th{left:auto;z-index:2;text-align:right}
+.cons thead tr:nth-child(2) th.txt{text-align:left}
+.pager{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:10px;color:var(--muted);font-size:14px}
+.count{color:var(--muted);font-size:14px}
+
+/* Estado vazio e carregamento */
+.empty{max-width:640px;padding:48px 0}
+.empty h2{font-size:30px;margin:0 0 10px}
+.empty p{color:var(--muted)}
+.empty ol{padding-left:20px;color:var(--muted)}
+.empty li{margin:4px 0}
+.drop{margin-top:22px;border:2px dashed var(--line-strong);border-radius:10px;padding:28px;text-align:center;color:var(--muted)}
+.drop.over{border-color:var(--water);background:var(--water-soft)}
+.overlay{position:fixed;inset:0;background:rgba(10,25,30,.55);display:flex;align-items:center;justify-content:center;z-index:50}
+.overlay-box{background:var(--surface);border-radius:10px;padding:24px 28px;width:min(460px,90vw)}
+.overlay-box h3{margin:0 0 6px;font-family:var(--num);font-size:20px}
+.overlay-box p{margin:0 0 14px;color:var(--muted);font-size:14px;min-height:2.9em}
+.bar{height:8px;background:var(--water-soft);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--water);transition:width .2s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:8px;z-index:60;font-size:14px;max-width:90vw}
+.foot{color:var(--muted);font-size:13px;margin-top:28px}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr}
+  .stats{border-left:0}
+  .stat{padding:10px 12px 10px 0}
+}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>Economias de esgoto 2026</h1>
+      <p id="status">Nenhuma base carregada</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="btnFiles" type="button">Carregar arquivos</button>
+      <button class="btn" id="btnFolder" type="button">Carregar pasta</button>
+      <button class="btn quiet" id="btnClear" type="button" hidden>Apagar dados do navegador</button>
+      <input type="file" id="inFiles" accept=".xlsx" multiple hidden>
+      <input type="file" id="inFolder" webkitdirectory multiple hidden>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist" id="tabs" hidden>
+    <button class="tab" role="tab" aria-selected="true" data-tab="resumo" id="tab-resumo">Resumo</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="cons" id="tab-cons">Consolidado</button>
+  </nav>
+</header>
+
+<div class="filters" id="filters" hidden>
+  <label class="field">Cidade <select id="fCid"></select></label>
+  <label class="field">Sub-categoria <select id="fSub"></select></label>
+  <div class="field" id="metricWrap">Ver
+    <div class="seg" role="group" aria-label="Indicador">
+      <button type="button" data-metric="eco" aria-pressed="true">Economias</button>
+      <button type="button" data-metric="fat" aria-pressed="false">Faturamento (R$)</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="empty" id="empty">
+    <h2>Carregue a base para começar</h2>
+    <p>O painel lê os arquivos .xlsx direto do seu computador. Nada é enviado para a internet: os dados ficam guardados só neste navegador até você carregar uma base nova.</p>
+    <ol>
+      <li>Use um arquivo com todas as abas ou uma pasta com vários arquivos.</li>
+      <li>Cada aba precisa ter as colunas NUM_LIGACAO, Referência, ULTIMO_CONTRATO e as colunas de faturamento e economias.</li>
+      <li>Só as linhas com ULTIMO_CONTRATO = SIM entram na análise.</li>
+    </ol>
+    <div class="drop" id="drop">Arraste os arquivos .xlsx para cá</div>
+  </section>
+
+  <section id="view-resumo" role="tabpanel" aria-labelledby="tab-resumo" hidden>
+    <div class="hero">
+      <div>
+        <div class="hero-big" id="heroBig">0</div>
+        <div class="hero-label" id="heroLabel"></div>
+        <div class="hero-sub" id="heroSub"></div>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+
+    <h2 id="t1"></h2>
+    <p class="lead" id="l1"></p>
+    <div class="panel chart" id="chartCombo"></div>
+
+    <h2>Mês a mês</h2>
+    <p class="lead" id="lMes"></p>
+    <div class="tbl-wrap" id="tblMes"></div>
+
+    <h2>Entradas e saídas por mês</h2>
+    <p class="lead">Aumentos e reduções somados matrícula a matrícula, comparando com o mês anterior. A linha é o saldo.</p>
+    <div class="panel chart" id="chartMov"></div>
+
+    <h2>Por sub-categoria</h2>
+    <p class="lead" id="lSub"></p>
+    <div class="tbl-wrap" id="tblSub"></div>
+
+    <h2>Por cidade</h2>
+    <p class="lead" id="lCid"></p>
+    <div class="tbl-wrap tall" id="tblCid"></div>
+
+    <p class="foot" id="foot"></p>
+  </section>
+
+  <section id="view-cons" role="tabpanel" aria-labelledby="tab-cons" hidden>
+    <div class="cons-bar">
+      <label class="field">Buscar <input type="search" id="cSearch" placeholder="Matrícula ou nome"></label>
+      <label class="field">Movimento do esgoto
+        <select id="cMov">
+          <option value="all">Todas as matrículas</option>
+          <option value="entrou">Passou a pagar esgoto</option>
+          <option value="saiu">Deixou de pagar esgoto</option>
+          <option value="aumentou">Aumentou economias de esgoto</option>
+          <option value="reduziu">Reduziu economias de esgoto</option>
+          <option value="igual">Sem mudança</option>
+        </select>
+      </label>
+      <label class="field">Ordenar
+        <select id="cSort">
+          <option value="mat">Matrícula</option>
+          <option value="mais">Maior aumento de esgoto</option>
+          <option value="menos">Maior redução de esgoto</option>
+        </select>
+      </label>
+      <button class="btn" id="btnExport" type="button">Exportar CSV</button>
+    </div>
+    <div class="cons-bar">
+      <span class="count">Colunas por referência</span>
+      <div class="chips" id="chips"></div>
+    </div>
+    <p class="count" id="cCount"></p>
+    <div class="tbl-wrap tall cons" id="tblCons"></div>
+    <div class="pager">
+      <button class="btn" id="pPrev" type="button">Anterior</button>
+      <span id="pInfo"></span>
+      <button class="btn" id="pNext" type="button">Próxima</button>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="overlay-box" role="status" aria-live="polite">
+    <h3 id="ovTitle">Lendo a base</h3>
+    <p id="ovMsg">Preparando…</p>
+    <div class="bar"><i id="ovBar"></i></div>
+  </div>
+</div>
+
+<!-- ===================== Worker: lê os .xlsx sem travar a tela ===================== -->
+<script type="text/plain" id="worker-src">
+const ALIAS = {
+  NUM_LIGACAO:'mat', NOM_CLIENTE:'nome', CIDADE:'cid', SUB_CATEGORIA:'sub', SIT_LIG:'sl', SIT_CONTRATO:'sc',
+  REFERENCIA:'ref', ULTIMO_CONTRATO:'ult', COD_GRUPO:'grp', TIPO_FATURAMENTO:'tipo',
+  FATURAMENTO_BRUTO_DIRETA_AGUA:'fa', FATURAMENTO_BRUTO_DIRETA_ESGOTO:'fe',
+  QTD_ECO_FAT_AGUA:'qa', QTD_ECO_FAT_ESGOTO:'qe', ECO_TOTAL:'et'
+};
+const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase().replace(/\s+/g,'_');
+const str = v => v == null ? '' : String(v).trim();
+function toNum(v){
+  if (v == null || v === '') return 0;
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  let s = String(v).trim();
+  if (s.indexOf(',') >= 0) s = s.replace(/\./g,'').replace(',', '.');
+  const n = Number(s); return isFinite(n) ? n : 0;
+}
+function refKey(v){
+  if (v == null || v === '') return null;
+  if (typeof v === 'number'){
+    if (v < 20000 || v > 80000) return null;
+    const d = new Date(Math.round((v - 25569) * 86400000));
+    return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2,'0');
+  }
+  const s = String(v).trim(); let m;
+  if ((m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s))) return m[3] + '-' + m[2].padStart(2,'0');
+  if ((m = /^(\d{4})-(\d{1,2})/.exec(s))) return m[1] + '-' + m[2].padStart(2,'0');
+  if ((m = /^(\d{1,2})\/(\d{4})$/.exec(s))) return m[2] + '-' + m[1].padStart(2,'0');
+  return null;
+}
+function dec(s){
+  if (s.indexOf('&') < 0) return s;
+  return s.replace(/&(amp|lt|gt|quot|apos|#x[0-9a-fA-F]+|#\d+);/g, (x, e) =>
+    e === 'amp' ? '&' : e === 'lt' ? '<' : e === 'gt' ? '>' : e === 'quot' ? '"' : e === 'apos' ? "'" :
+    e[1] === 'x' ? String.fromCodePoint(parseInt(e.slice(2), 16)) : String.fromCodePoint(+e.slice(1)));
+}
+function texts(xml){
+  xml = xml.replace(/<rPh\b[\s\S]*?<\/rPh>/g, '');
+  let out = '', m; const re = /<t\b[^>]*>([\s\S]*?)<\/t>/g;
+  while ((m = re.exec(xml))) out += m[1];
+  return dec(out);
+}
+function colIdx(letters){ let n = 0; for (let i = 0; i < letters.length; i++) n = n * 26 + (letters.charCodeAt(i) - 64); return n - 1; }
+
+/* ---------- leitura do zip (.xlsx) por partes ---------- */
+async function readZip(file){
+  const tailLen = Math.min(file.size, 65557 + 22);
+  const tail = new DataView(await file.slice(file.size - tailLen).arrayBuffer());
+  let eocd = -1;
+  for (let i = tailLen - 22; i >= 0; i--) if (tail.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  if (eocd < 0) throw new Error(file.name + ' não parece ser um arquivo .xlsx válido.');
+  let n = tail.getUint16(eocd + 10, true), cdSize = tail.getUint32(eocd + 12, true), cdOff = tail.getUint32(eocd + 16, true);
+  if ((cdOff === 0xFFFFFFFF || n === 0xFFFF) && eocd >= 20 && tail.getUint32(eocd - 20, true) === 0x07064b50){
+    const z64off = Number(tail.getBigUint64(eocd - 12, true));
+    const z = new DataView(await file.slice(z64off, z64off + 56).arrayBuffer());
+    n = Number(z.getBigUint64(32, true)); cdSize = Number(z.getBigUint64(40, true)); cdOff = Number(z.getBigUint64(48, true));
+  }
+  const cd = new DataView(await file.slice(cdOff, cdOff + cdSize).arrayBuffer());
+  const td = new TextDecoder();
+  const entries = []; let p = 0;
+  while (p + 46 <= cd.byteLength && cd.getUint32(p, true) === 0x02014b50){
+    const method = cd.getUint16(p + 10, true);
+    let csize = cd.getUint32(p + 20, true), usize = cd.getUint32(p + 24, true);
+    const nl = cd.getUint16(p + 28, true), xl = cd.getUint16(p + 30, true), cl = cd.getUint16(p + 32, true);
+    let off = cd.getUint32(p + 42, true);
+    const name = td.decode(new Uint8Array(cd.buffer, cd.byteOffset + p + 46, nl));
+    let q = p + 46 + nl; const xend = q + xl;
+    while (q + 4 <= xend){
+      const id = cd.getUint16(q, true), sz = cd.getUint16(q + 2, true); let r = q + 4;
+      if (id === 0x0001){
+        if (usize === 0xFFFFFFFF){ usize = Number(cd.getBigUint64(r, true)); r += 8; }
+        if (csize === 0xFFFFFFFF){ csize = Number(cd.getBigUint64(r, true)); r += 8; }
+        if (off === 0xFFFFFFFF){ off = Number(cd.getBigUint64(r, true)); r += 8; }
+      }
+      q += 4 + sz;
+    }
+    entries.push({ name, method, csize, usize, off });
+    p = xend + cl;
+  }
+  return entries;
+}
+async function entryStream(file, e){
+  const lh = new DataView(await file.slice(e.off, e.off + 30).arrayBuffer());
+  const start = e.off + 30 + lh.getUint16(26, true) + lh.getUint16(28, true);
+  let s = file.slice(start, start + e.csize).stream();
+  if (e.method === 8) s = s.pipeThrough(new DecompressionStream('deflate-raw'));
+  else if (e.method !== 0) throw new Error('Compressão não suportada em ' + e.name);
+  return s.pipeThrough(new TextDecoderStream());
+}
+async function entryText(file, e){
+  const r = (await entryStream(file, e)).getReader(); let out = '';
+  for (;;){ const { value, done } = await r.read(); if (done) break; out += value; }
+  return out;
+}
+async function streamBlocks(file, e, closeTag, onBlock, onProgress){
+  const reader = (await entryStream(file, e)).getReader();
+  let buf = '', seen = 0;
+  for (;;){
+    const { value, done } = await reader.read();
+    if (done) break;
+    seen += value.length; buf += value;
+    let pos = 0, idx;
+    while ((idx = buf.indexOf(closeTag, pos)) !== -1){
+      const blk = buf.slice(pos, idx); pos = idx + closeTag.length;
+      if (onBlock(blk) === false){ try { await reader.cancel(); } catch (_) {} return; }
+    }
+    buf = buf.slice(pos);
+    if (onProgress) onProgress(Math.min(1, seen / Math.max(1, e.usize)));
+  }
+}
+
+const RE_C = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g;
+const RE_R = /\br="([A-Z]+)/, RE_T = /\bt="([^"]+)"/, RE_V = /<v>([\s\S]*?)<\/v>/;
+function parseCells(blk, sst){
+  const out = []; let m, seq = 0; RE_C.lastIndex = 0;
+  while ((m = RE_C.exec(blk))){
+    const a = m[1], inner = m[2];
+    const rm = RE_R.exec(a); const col = rm ? colIdx(rm[1]) : seq; seq = col + 1;
+    if (inner === undefined) continue;
+    const tm = RE_T.exec(a); const t = tm ? tm[1] : 'n';
+    let v;
+    if (t === 'inlineStr') v = texts(inner);
+    else {
+      const vm = RE_V.exec(inner); if (!vm) continue;
+      const raw = vm[1];
+      if (t === 's') v = sst[+raw];
+      else if (t === 'str' || t === 'e') v = dec(raw);
+      else if (t === 'b') v = raw === '1' ? 'VERDADEIRO' : 'FALSO';
+      else v = +raw;
+    }
+    out[col] = v;
+  }
+  return out;
+}
+
+/* ---------- acumuladores ---------- */
+class G {
+  constructor(T, n){ this.T = T; this.a = new T(n || 65536); this.n = 0; }
+  push(x){ if (this.n === this.a.length){ const b = new this.T(this.a.length * 2); b.set(this.a); this.a = b; } this.a[this.n++] = x; }
+  out(){ return this.a.slice(0, this.n); }
+}
+class Dict {
+  constructor(){ this.m = new Map(); this.list = []; }
+  id(s){ let i = this.m.get(s); if (i === undefined){ i = this.list.length; this.m.set(s, i); this.list.push(s); } return i; }
+}
+class Store {
+  constructor(){
+    this.matIdx = new Map(); this.mats = []; this.nomes = [];
+    this.cid = new G(Uint16Array); this.sub = new G(Uint16Array); this.sl = new G(Uint16Array); this.sc = new G(Uint16Array); this.last = new G(Int32Array);
+    this.d = { cid: new Dict(), sub: new Dict(), sl: new Dict(), sc: new Dict(), tipo: new Dict() };
+    this.refMap = new Map();
+    this.rMat = new G(Int32Array, 1 << 20); this.rRef = new G(Uint16Array, 1 << 20); this.rGrp = new G(Int32Array, 1 << 20); this.rTipo = new G(Uint16Array, 1 << 20);
+    this.rFa = new G(Float64Array, 1 << 20); this.rFe = new G(Float64Array, 1 << 20);
+    this.rQa = new G(Int32Array, 1 << 20); this.rQe = new G(Int32Array, 1 << 20); this.rEt = new G(Int32Array, 1 << 20);
+    this.stats = { linhas: 0, naoUltimo: 0, semRef: 0, abas: [], ignoradas: [] };
+  }
+  add(c, h){
+    const mv = c[h.mat]; if (mv == null || mv === '') return;
+    if (h.ult !== undefined && norm(c[h.ult]) !== 'SIM'){ this.stats.naoUltimo++; return; }
+    const rk = refKey(c[h.ref]); if (!rk){ this.stats.semRef++; return; }
+    const mk = typeof mv === 'number' ? String(Math.round(mv)) : String(mv).trim();
+    let mi = this.matIdx.get(mk);
+    if (mi === undefined){
+      mi = this.mats.length; this.matIdx.set(mk, mi); this.mats.push(mk); this.nomes.push('');
+      this.cid.push(0); this.sub.push(0); this.sl.push(0); this.sc.push(0); this.last.push(-1);
+    }
+    const rnum = +rk.replace('-', '');
+    if (rnum >= this.last.a[mi]){
+      this.last.a[mi] = rnum;
+      this.nomes[mi] = str(c[h.nome]);
+      this.cid.a[mi] = this.d.cid.id(str(c[h.cid])); this.sub.a[mi] = this.d.sub.id(str(c[h.sub]));
+      this.sl.a[mi] = this.d.sl.id(str(c[h.sl])); this.sc.a[mi] = this.d.sc.id(str(c[h.sc]));
+    }
+    let ri = this.refMap.get(rk); if (ri === undefined){ ri = this.refMap.size; this.refMap.set(rk, ri); }
+    const g = c[h.grp];
+    this.rMat.push(mi); this.rRef.push(ri);
+    this.rGrp.push(g == null || g === '' ? -1 : Math.round(toNum(g)));
+    this.rTipo.push(this.d.tipo.id(str(c[h.tipo])));
+    this.rFa.push(toNum(c[h.fa])); this.rFe.push(toNum(c[h.fe]));
+    this.rQa.push(Math.round(toNum(c[h.qa]))); this.rQe.push(Math.round(toNum(c[h.qe]))); this.rEt.push(Math.round(toNum(c[h.et])));
+    this.stats.linhas++;
+  }
+  build(){
+    const refs = [...this.refMap.keys()].sort();
+    const remap = new Uint16Array(refs.length); refs.forEach((k, i) => { remap[this.refMap.get(k)] = i; });
+    const nM = this.mats.length, nR = refs.length, N = nM * nR;
+    const present = new Uint8Array(N), grp = new Int32Array(N).fill(-1), tipo = new Uint16Array(N);
+    const fa = new Float64Array(N), fe = new Float64Array(N), qa = new Int32Array(N), qe = new Int32Array(N), et = new Int32Array(N);
+    const n = this.rMat.n, A = this.rMat.a, R = this.rRef.a;
+    for (let i = 0; i < n; i++){
+      const j = A[i] * nR + remap[R[i]];
+      present[j] = 1; grp[j] = this.rGrp.a[i]; tipo[j] = this.rTipo.a[i];
+      fa[j] = this.rFa.a[i]; fe[j] = this.rFe.a[i]; qa[j] = this.rQa.a[i]; qe[j] = this.rQe.a[i]; et[j] = this.rEt.a[i];
+    }
+    return {
+      refs, mats: this.mats, nomes: this.nomes,
+      cid: this.cid.out(), sub: this.sub.out(), sl: this.sl.out(), sc: this.sc.out(),
+      dict: { cid: this.d.cid.list, sub: this.d.sub.list, sl: this.d.sl.list, sc: this.d.sc.list, tipo: this.d.tipo.list },
+      present, grp, tipo, fa, fe, qa, qe, et, stats: this.stats
+    };
+  }
+}
+
+/* ---------- processamento ---------- */
+let lastPost = 0;
+function progress(title, msg, pct, force){
+  const now = Date.now();
+  if (!force && now - lastPost < 200) return;
+  lastPost = now; self.postMessage({ type: 'progress', title, msg, pct });
+}
+async function sheetList(file, byName){
+  const wb = byName.get('xl/workbook.xml'), rel = byName.get('xl/_rels/workbook.xml.rels');
+  const out = [];
+  if (wb && rel){
+    const wx = await entryText(file, wb), rx = await entryText(file, rel);
+    const targets = {};
+    for (const m of rx.matchAll(/<Relationship\b[^>]*>/g)){
+      const id = /\bId="([^"]+)"/.exec(m[0]), tg = /\bTarget="([^"]+)"/.exec(m[0]);
+      if (id && tg) targets[id[1]] = tg[1];
+    }
+    for (const m of wx.matchAll(/<sheet\b[^>]*>/g)){
+      const nm = /\bname="([^"]*)"/.exec(m[0]), id = /\br:id="([^"]+)"/.exec(m[0]);
+      if (!nm || !id || !targets[id[1]]) continue;
+      let t = targets[id[1]];
+      t = t.startsWith('/') ? t.slice(1) : 'xl/' + t.replace(/^\.\//, '');
+      if (byName.has(t)) out.push({ name: dec(nm[1]), entry: byName.get(t) });
+    }
+  }
+  if (!out.length) for (const [k, e] of byName) if (/^xl\/worksheets\/sheet\d+\.xml$/.test(k)) out.push({ name: k.split('/').pop(), entry: e });
+  return out;
+}
+async function processFiles(files){
+  const S = new Store();
+  for (let fi = 0; fi < files.length; fi++){
+    const file = files[fi];
+    const label = files.length > 1 ? `Arquivo ${fi + 1} de ${files.length}: ${file.name}` : file.name;
+    progress(label, 'Abrindo o arquivo…', 0, true);
+    const entries = await readZip(file);
+    const byName = new Map(entries.map(e => [e.name, e]));
+    let sst = [];
+    const se = byName.get('xl/sharedStrings.xml');
+    if (se){
+      progress(label, 'Lendo os textos do arquivo…', 0, true);
+      await streamBlocks(file, se, '</si>', blk => { sst.push(texts(blk.slice(blk.indexOf('<si')))); },
+        p => progress(label, 'Lendo os textos do arquivo…', p));
+    }
+    const sheets = await sheetList(file, byName);
+    for (const sh of sheets){
+      let header = null, seen = 0;
+      const before = S.stats.linhas;
+      const msg = () => `Aba “${sh.name}”: ${S.stats.linhas.toLocaleString('pt-BR')} linhas lidas no total`;
+      await streamBlocks(file, sh.entry, '</row>', blk => {
+        seen++;
+        const c = parseCells(blk, sst);
+        if (!header){
+          if (c.some(v => norm(v) === 'NUM_LIGACAO')){
+            header = {};
+            c.forEach((v, i) => { const k = ALIAS[norm(v)]; if (k && header[k] === undefined) header[k] = i; });
+            if (header.ref === undefined) throw new Error(`A aba “${sh.name}” não tem a coluna Referência.`);
+          } else if (seen > 30) return false;
+          return;
+        }
+        S.add(c, header);
+      }, p => progress(label, msg(), p));
+      if (header) S.stats.abas.push({ arquivo: file.name, aba: sh.name, linhas: S.stats.linhas - before });
+      else S.stats.ignoradas.push(file.name + ' / ' + sh.name);
+    }
+  }
+  if (!S.stats.linhas) throw new Error('Nenhuma linha válida encontrada. Confira se as abas têm a coluna NUM_LIGACAO no cabeçalho.');
+  progress('Montando o consolidado', 'Organizando matrículas e referências…', 1, true);
+  return S.build();
+}
+self.onmessage = async ev => {
+  try {
+    const d = await processFiles(ev.data.files);
+    const tr = [d.cid, d.sub, d.sl, d.sc, d.present, d.grp, d.tipo, d.fa, d.fe, d.qa, d.qe, d.et].map(a => a.buffer);
+    self.postMessage({ type: 'done', data: d }, tr);
+  } catch (err){
+    self.postMessage({ type: 'error', message: err && err.message ? err.message : String(err) });
+  }
+};
+</script>
+
+<!-- ===================== Painel ===================== -->
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const refLabel = k => { const [y, m] = k.split('-'); return MESES[+m - 1] + '/' + y.slice(2); };
+const nf0 = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
+const nf1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const nf2 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const brl0 = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const signed = (v, f) => Math.abs(v) < 0.005 ? f(0) : (v > 0 ? '+' : '−') + f(Math.abs(v));
+const cls = v => v > 0.004 ? 'pos' : v < -0.004 ? 'neg' : '';
+
+let D = null;
+const st = { cid: -1, sub: -1, metric: 'eco', tab: 'resumo', page: 0, list: null, sortCid: 'tot' };
+const FIELDS = [
+  { k: 'ult', h: 'ULTIMO_CONTRATO', l: 'Último contrato' },
+  { k: 'grp', h: 'COD_GRUPO', l: 'Grupo' },
+  { k: 'tipo', h: 'TIPO_FATURAMENTO', l: 'Tipo de faturamento' },
+  { k: 'fa', h: 'Faturamento_bruto_direta_agua', l: 'Fat. água (R$)' },
+  { k: 'fe', h: 'Faturamento_bruto_direta_esgoto', l: 'Fat. esgoto (R$)' },
+  { k: 'qa', h: 'Qtd_eco_fat_agua', l: 'Eco. água' },
+  { k: 'qe', h: 'Qtd_eco_fat_esgoto', l: 'Eco. esgoto' },
+  { k: 'et', h: 'Eco_total', l: 'Eco. total' }
+];
+const visible = new Set(FIELDS.map(f => f.k));
+
+/* ---------- utilidades de interface ---------- */
+function toast(msg){
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; t.setAttribute('role', 'status');
+  document.body.appendChild(t); setTimeout(() => t.remove(), 4500);
+}
+function overlay(show, title, msg, pct){
+  $('#overlay').hidden = !show; if (!show) return;
+  if (title != null) $('#ovTitle').textContent = title;
+  if (msg != null) $('#ovMsg').textContent = msg;
+  if (pct != null) $('#ovBar').style.width = Math.round(pct * 100) + '%';
+}
+
+/* ---------- armazenamento no navegador ---------- */
+function idb(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('painel-esgoto-2026', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('dados');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function idbDo(mode, fn){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const t = db.transaction('dados', mode); const req = fn(t.objectStore('dados'));
+    t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+  });
+}
+const idbSave = v => idbDo('readwrite', s => s.put(v, 'atual'));
+const idbLoad = () => idbDo('readonly', s => s.get('atual'));
+const idbClear = () => idbDo('readwrite', s => s.delete('atual'));
+
+/* ---------- carregamento ---------- */
+function loadFiles(list){
+  const files = [...list].filter(f => /\.xlsx$/i.test(f.name) && !f.name.startsWith('~$'));
+  if (!files.length){ toast('Nenhum arquivo .xlsx encontrado na seleção.'); return; }
+  files.sort((a, b) => (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name));
+  let worker;
+  try {
+    const src = $('#worker-src').textContent;
+    worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  } catch (e){ toast('O navegador bloqueou o processamento. Use o Chrome ou o Edge atualizados.'); return; }
+  overlay(true, 'Lendo a base', 'Preparando…', 0);
+  worker.onmessage = async ev => {
+    const m = ev.data;
+    if (m.type === 'progress') overlay(true, m.title, m.msg, m.pct);
+    else if (m.type === 'error'){ worker.terminate(); overlay(false); toast(m.message); }
+    else if (m.type === 'done'){
+      worker.terminate();
+      const d = m.data;
+      d.meta = { arquivos: files.map(f => f.name), carregadoEm: new Date().toISOString() };
+      overlay(true, 'Guardando no navegador', 'Assim você não precisa carregar de novo na próxima vez.', 1);
+      try { await idbSave(d); } catch (e){ toast('Os dados não puderam ser guardados no navegador e valem só nesta sessão.'); }
+      overlay(false);
+      setData(d);
+    }
+  };
+  worker.onerror = e => { overlay(false); toast('Erro ao ler os arquivos: ' + (e.message || 'verifique o formato.')); };
+  worker.postMessage({ files });
+}
+
+function setData(d){
+  D = d;
+  const nM = D.mats.length;
+  // ordem por matrícula (numérica quando possível)
+  const ord = new Int32Array(nM); for (let i = 0; i < nM; i++) ord[i] = i;
+  const key = D.mats.map(s => { const n = Number(s); return isFinite(n) ? n : Infinity; });
+  D.ordMat = ord.sort((a, b) => key[a] - key[b] || (D.mats[a] < D.mats[b] ? -1 : 1));
+  fillSelect($('#fCid'), D.dict.cid, 'Todas'); fillSelect($('#fSub'), D.dict.sub, 'Todas');
+  st.cid = -1; st.sub = -1; st.page = 0;
+  const first = refLabel(D.refs[0]), last = refLabel(D.refs[D.refs.length - 1]);
+  const dt = new Date(D.meta.carregadoEm);
+  $('#status').textContent = `${nf0.format(nM)} matrículas, ${D.refs.length} referências (${first} a ${last}). Carregado em ${dt.toLocaleDateString('pt-BR')} às ${dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.`;
+  $('#empty').hidden = true; $('#tabs').hidden = false; $('#filters').hidden = false; $('#btnClear').hidden = false;
+  buildChips();
+  showTab(st.tab);
+}
+function fillSelect(sel, list, allLabel){
+  const items = list.map((v, i) => [v, i]).sort((a, b) => a[0].localeCompare(b[0], 'pt-BR'));
+  sel.innerHTML = `<option value="-1">${allLabel}</option>` + items.map(([v, i]) => `<option value="${i}">${esc(v || '(vazio)')}</option>`).join('');
+}
+
+/* ---------- cálculos ---------- */
+function keepMask(){
+  const n = D.mats.length, k = new Uint8Array(n);
+  for (let m = 0; m < n; m++) k[m] = (st.cid < 0 || D.cid[m] === st.cid) && (st.sub < 0 || D.sub[m] === st.sub) ? 1 : 0;
+  return k;
+}
+function series(k, A){
+  const nR = D.refs.length, P = D.present;
+  const stock = new Float64Array(nR), gain = new Float64Array(nR), loss = new Float64Array(nR);
+  for (let m = 0, n = D.mats.length; m < n; m++){
+    if (!k[m]) continue;
+    const b = m * nR; let prev = 0;
+    for (let r = 0; r < nR; r++){
+      const v = P[b + r] ? A[b + r] : 0;
+      stock[r] += v;
+      if (r){ const d = v - prev; if (d > 0) gain[r] += d; else if (d < 0) loss[r] += d; }
+      prev = v;
+    }
+  }
+  return { stock, gain, loss };
+}
+function bySegment(k, seg, nSeg, A){
+  const nR = D.refs.length, P = D.present, out = new Float64Array(nSeg * nR);
+  for (let m = 0, n = D.mats.length; m < n; m++){
+    if (!k[m]) continue;
+    const b = m * nR, s = seg[m] * nR;
+    for (let r = 0; r < nR; r++) if (P[b + r]) out[s + r] += A[b + r];
+  }
+  return out;
+}
+function movers(k){
+  const nR = D.refs.length, L = nR - 1; let entrou = 0, saiu = 0;
+  for (let m = 0, n = D.mats.length; m < n; m++){
+    if (!k[m]) continue;
+    const q0 = D.present[m * nR] ? D.qe[m * nR] : 0, qL = D.present[m * nR + L] ? D.qe[m * nR + L] : 0;
+    if (q0 === 0 && qL > 0) entrou++; else if (q0 > 0 && qL === 0) saiu++;
+  }
+  return { entrou, saiu };
+}
+
+/* ---------- gráficos SVG ---------- */
+function niceTicks(min, max, count){
+  if (min === max){ max = min + 1; }
+  const span = max - min, step0 = span / count, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(x => x * mag).find(x => x >= step0);
+  const lo = Math.floor(min / step) * step, hi = Math.ceil(max / step) * step, t = [];
+  for (let v = lo; v <= hi + step / 2; v += step) t.push(Math.abs(v) < step / 1e6 ? 0 : v);
+  return t;
+}
+function shortFmt(v, money){
+  const a = Math.abs(v), s = v < 0 ? '−' : '';
+  const pre = money ? 'R$ ' : '';
+  if (a >= 1e6) return s + pre + nf1.format(a / 1e6) + ' mi';
+  if (a >= 1e4) return s + pre + nf0.format(a / 1e3) + ' mil';
+  return s + pre + nf0.format(a);
+}
+function chart(el, labels, sets, opts){
+  // sets: [{type:'bar'|'line', values, color(fn|str), name, stack?}]
+  const W = 860, H = opts.h || 300, padL = opts.money ? 92 : 64, padR = 16, padT = 16, padB = 34;
+  const vals = []; sets.forEach(s => s.values.forEach(v => vals.push(v)));
+  if (opts.stacked){ /* barras empilhadas acima e abaixo de zero já ficam nos valores */ }
+  let min = Math.min(0, ...vals), max = Math.max(0, ...vals);
+  const ticks = niceTicks(min, max, 5); min = ticks[0]; max = ticks[ticks.length - 1];
+  const y = v => padT + (max - v) / (max - min || 1) * (H - padT - padB);
+  const n = labels.length, bw = (W - padL - padR) / n, x = i => padL + bw * i + bw / 2;
+  let g = '';
+  ticks.forEach(t => {
+    g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" ${t === 0 ? 'stroke-width="1.5" stroke="var(--line-strong)"' : ''}/>`;
+    g += `<text x="${padL - 8}" y="${y(t) + 4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--num)">${shortFmt(t, opts.money)}</text>`;
+  });
+  labels.forEach((l, i) => { g += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="12.5" fill="var(--muted)" font-family="var(--num)">${l}</text>`; });
+  const bars = sets.filter(s => s.type === 'bar');
+  const bwi = Math.min(46, bw * (opts.stacked ? .55 : .55));
+  bars.forEach(s => {
+    s.values.forEach((v, i) => {
+      if (v == null || Math.abs(v) < 1e-9) return;
+      const c = typeof s.color === 'function' ? s.color(v) : s.color;
+      const y0 = y(Math.max(0, v)), h = Math.abs(y(v) - y(0));
+      const tip = `${labels[i]}: ${s.name} ${opts.fmt(v)}`;
+      g += `<rect x="${x(i) - bwi / 2}" y="${y0}" width="${bwi}" height="${Math.max(1, h)}" rx="2" fill="${c}"><title>${esc(tip)}</title></rect>`;
+      if (s.label){
+        const ly = v >= 0 ? y0 - 6 : y0 + h + 14;
+        g += `<text x="${x(i)}" y="${ly}" text-anchor="middle" font-size="12" font-weight="600" fill="${c}" font-family="var(--num)">${esc(opts.lab(v))}</text>`;
+      }
+    });
+  });
+  sets.filter(s => s.type === 'line').forEach(s => {
+    const pts = s.values.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean);
+    if (pts.length) g += `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    s.values.forEach((v, i) => { if (v == null) return; g += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="var(--surface)" stroke="${s.color}" stroke-width="2"><title>${esc(labels[i] + ': ' + s.name + ' ' + opts.fmt(v))}</title></circle>`; });
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria)}">${g}</svg>` +
+    `<div class="legend">${opts.legend.map(([c, t]) => `<span><i style="background:${c}"></i>${t}</span>`).join('')}</div>`;
+}
+function spark(vals){
+  const w = 120, h = 28, n = vals.length; if (!n) return '';
+  const m = Math.max(1e-9, ...vals.map(Math.abs)), bw = w / n;
+  let g = `<line x1="0" x2="${w}" y1="${h / 2}" y2="${h / 2}" stroke="var(--line-strong)"/>`;
+  vals.forEach((v, i) => {
+    if (Math.abs(v) < 1e-9) return;
+    const bh = Math.abs(v) / m * (h / 2 - 1);
+    g += `<rect x="${i * bw + 1}" y="${v > 0 ? h / 2 - bh : h / 2}" width="${bw - 2}" height="${bh}" fill="${v > 0 ? 'var(--gain)' : 'var(--loss)'}"/>`;
+  });
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true">${g}</svg>`;
+}
+
+/* ---------- Resumo ---------- */
+function renderResumo(){
+  const k = keepMask(), nR = D.refs.length, L = nR - 1, labels = D.refs.map(refLabel);
+  const first = labels[0], last = labels[L];
+  const eco = series(k, D.qe), fat = series(k, D.fe), mv = movers(k);
+  const netEco = eco.stock[L] - eco.stock[0], netFat = fat.stock[L] - fat.stock[0];
+
+  const hb = $('#heroBig'); hb.textContent = signed(netEco, v => nf0.format(v)); hb.className = 'hero-big ' + cls(netEco);
+  $('#heroLabel').textContent = netEco >= 0 ? 'economias de esgoto a mais em 2026' : 'economias de esgoto a menos em 2026';
+  $('#heroSub').textContent = `Saldo de ${first} a ${last}: de ${nf0.format(eco.stock[0])} para ${nf0.format(eco.stock[L])} economias faturadas com esgoto.`;
+  const pct = eco.stock[0] ? netEco / eco.stock[0] * 100 : 0;
+  $('#stats').innerHTML = [
+    [signed(netFat, v => brl0.format(v)), `faturamento de esgoto a ${netFat >= 0 ? 'mais' : 'menos'} por mês (${last} contra ${first})`, cls(netFat)],
+    [signed(pct, v => nf1.format(v) + '%'), `variação sobre a base de ${first}`, cls(pct)],
+    [nf0.format(mv.entrou), `matrículas passaram a pagar esgoto`, ''],
+    [nf0.format(mv.saiu), `matrículas deixaram de pagar esgoto`, '']
+  ].map(([b, s, c]) => `<div class="stat"><b class="${c ? 'num ' : 'num'}" style="${c === 'pos' ? 'color:var(--gain)' : c === 'neg' ? 'color:var(--loss)' : ''}">${b}</b><span>${s}</span></div>`).join('');
+
+  const money = st.metric === 'fat', S = money ? fat : eco;
+  const fmt = money ? (v => signed(v, x => brl.format(x))) : (v => signed(v, x => nf0.format(x)));
+  const lab = money ? (v => signed(v, x => shortFmt(x, false))) : (v => signed(v, x => nf0.format(x)));
+  const what = money ? 'faturamento de esgoto' : 'economias de esgoto';
+
+  $('#t1').textContent = money ? 'Faturamento de esgoto: variação mês a mês' : 'Economias de esgoto: variação mês a mês';
+  $('#l1').textContent = `Barras: diferença para o mês anterior. Linha: acumulado desde ${first}.`;
+  const varM = labels.map((_, r) => r ? S.stock[r] - S.stock[r - 1] : null);
+  const acc = labels.map((_, r) => r ? S.stock[r] - S.stock[0] : 0);
+  chart($('#chartCombo'), labels, [
+    { type: 'bar', name: 'Variação', values: varM, color: v => v >= 0 ? 'var(--gain)' : 'var(--loss)', label: true },
+    { type: 'line', name: 'Acumulado', values: acc, color: 'var(--water)' }
+  ], { money, fmt, lab, aria: 'Variação mensal e acumulado de ' + what,
+       legend: [['var(--gain)', 'Aumento no mês'], ['var(--loss)', 'Redução no mês'], ['var(--water)', 'Acumulado desde ' + first]] });
+
+  chart($('#chartMov'), labels.slice(1), [
+    { type: 'bar', name: 'Entradas', values: [...S.gain].slice(1), color: 'var(--gain)' },
+    { type: 'bar', name: 'Saídas', values: [...S.loss].slice(1), color: 'var(--loss)' },
+    { type: 'line', name: 'Saldo', values: [...S.gain].slice(1).map((g, i) => g + S.loss[i + 1]), color: 'var(--water)' }
+  ], { money, fmt, lab, stacked: true, h: 240, aria: 'Entradas e saídas mensais de ' + what,
+       legend: [['var(--gain)', 'Entradas'], ['var(--loss)', 'Saídas'], ['var(--water)', 'Saldo']] });
+
+  // Tabela mês a mês
+  const f = money ? (v => brl0.format(v)) : (v => nf0.format(v));
+  const fs = money ? (v => signed(v, x => brl0.format(x))) : (v => signed(v, x => nf0.format(x)));
+  $('#lMes').textContent = money ? 'Faturamento bruto de esgoto, somado por referência.' : 'Economias faturadas com esgoto, somadas por referência.';
+  const rows = [
+    ['Total no mês', r => `<td>${f(S.stock[r])}</td>`],
+    ['Variação no mês', r => r ? `<td class="${cls(S.stock[r] - S.stock[r - 1])}">${fs(S.stock[r] - S.stock[r - 1])}</td>` : '<td class="base">base</td>'],
+    ['Entradas', r => r ? `<td class="${cls(S.gain[r])}">${fs(S.gain[r])}</td>` : '<td></td>'],
+    ['Saídas', r => r ? `<td class="${cls(S.loss[r])}">${fs(S.loss[r])}</td>` : '<td></td>'],
+    ['Acumulado desde ' + first, r => r ? `<td class="${cls(S.stock[r] - S.stock[0])}">${fs(S.stock[r] - S.stock[0])}</td>` : '<td></td>']
+  ];
+  $('#tblMes').innerHTML = `<table><thead><tr><th></th>${labels.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>` +
+    rows.map(([n, fn]) => `<tr><td>${n}</td>${labels.map((_, r) => fn(r)).join('')}</tr>`).join('') + '</tbody></table>';
+
+  const A = money ? D.fe : D.qe;
+  segTable($('#tblSub'), k, D.sub, D.dict.sub, A, money, 'Sub-categoria', 'sortSub');
+  segTable($('#tblCid'), k, D.cid, D.dict.cid, A, money, 'Cidade', 'sortCid');
+  const txt = `Base em ${first}, variação de cada mês contra o anterior e total de 2026 (${last} menos ${first}).`;
+  $('#lSub').textContent = txt; $('#lCid').textContent = txt + ' Clique nos títulos para ordenar.';
+  const s = D.stats;
+  $('#foot').textContent = `Base: ${nf0.format(s.linhas)} linhas com ULTIMO_CONTRATO = SIM em ${s.abas.length} aba(s). ` +
+    `${nf0.format(s.naoUltimo)} linhas de contratos anteriores foram desconsideradas.` +
+    (s.semRef ? ` ${nf0.format(s.semRef)} linhas sem referência válida foram ignoradas.` : '') +
+    (s.ignoradas.length ? ` Abas sem a coluna NUM_LIGACAO, ignoradas: ${s.ignoradas.join(', ')}.` : '');
+}
+function segTable(el, k, seg, names, A, money, title, sortKey){
+  const nR = D.refs.length, L = nR - 1, labels = D.refs.map(refLabel), nS = names.length;
+  const T = bySegment(k, seg, nS, A);
+  const used = new Uint8Array(nS); for (let m = 0; m < D.mats.length; m++) if (k[m]) used[seg[m]] = 1;
+  let rows = []; for (let s = 0; s < nS; s++) if (used[s]) rows.push(s);
+  const tot = s => T[s * nR + L] - T[s * nR];
+  const sk = st[sortKey] || 'tot';
+  rows.sort(sk === 'nome' ? ((a, b) => names[a].localeCompare(names[b], 'pt-BR')) : sk === 'base' ? ((a, b) => T[b * nR] - T[a * nR]) : ((a, b) => tot(b) - tot(a)));
+  const f = money ? (v => brl0.format(v)) : (v => nf0.format(v));
+  const fs = money ? (v => signed(v, x => brl0.format(x))) : (v => signed(v, x => nf0.format(x)));
+  const sum = new Float64Array(nR); rows.forEach(s => { for (let r = 0; r < nR; r++) sum[r] += T[s * nR + r]; });
+  const line = (name, get, isSum) => {
+    let h = `<tr${isSum ? ' class="sum"' : ''}><td>${esc(name)}</td><td class="base">${f(get(0))}</td>`;
+    const vs = [];
+    for (let r = 1; r < nR; r++){ const v = get(r) - get(r - 1); vs.push(v); h += `<td class="${cls(v)}">${fs(v)}</td>`; }
+    const t = get(L) - get(0);
+    return h + `<td class="tot ${cls(t)}">${fs(t)}</td><td>${spark(vs)}</td></tr>`;
+  };
+  el.innerHTML = `<table><thead><tr>
+      <th class="sortable" data-sort="nome" data-key="${sortKey}">${title}</th>
+      <th class="sortable" data-sort="base" data-key="${sortKey}">${labels[0]} (base)</th>
+      ${labels.slice(1).map(l => `<th>${l}</th>`).join('')}
+      <th class="tot sortable" data-sort="tot" data-key="${sortKey}">Total 2026</th><th>Tendência</th></tr></thead><tbody>` +
+    rows.map(s => line(names[s] || '(vazio)', r => T[s * nR + r])).join('') +
+    line('Total', r => sum[r], true) + '</tbody></table>';
+}
+
+/* ---------- Consolidado ---------- */
+function buildChips(){
+  $('#chips').innerHTML = FIELDS.map(f => `<button type="button" class="chip" data-f="${f.k}" aria-pressed="${visible.has(f.k)}">${f.l}</button>`).join('');
+}
+function consList(){
+  const k = keepMask(), nR = D.refs.length, L = nR - 1;
+  const q = $('#cSearch').value.trim(), qU = q.toUpperCase(), mov = $('#cMov').value, sort = $('#cSort').value;
+  const digits = /^\d+$/.test(q);
+  const out = [];
+  const delta = new Float64Array(D.mats.length);
+  for (const m of D.ordMat){
+    if (!k[m]) continue;
+    if (q && !(digits ? D.mats[m].includes(q) : D.nomes[m].toUpperCase().includes(qU))) continue;
+    const q0 = D.present[m * nR] ? D.qe[m * nR] : 0, qL = D.present[m * nR + L] ? D.qe[m * nR + L] : 0;
+    delta[m] = qL - q0;
+    if (mov === 'entrou' && !(q0 === 0 && qL > 0)) continue;
+    if (mov === 'saiu' && !(q0 > 0 && qL === 0)) continue;
+    if (mov === 'aumentou' && !(qL > q0)) continue;
+    if (mov === 'reduziu' && !(qL < q0)) continue;
+    if (mov === 'igual' && qL !== q0) continue;
+    out.push(m);
+  }
+  if (sort === 'mais') out.sort((a, b) => delta[b] - delta[a]);
+  else if (sort === 'menos') out.sort((a, b) => delta[a] - delta[b]);
+  return out;
+}
+function cellVal(f, j, forCsv){
+  if (!D.present[j]) return '';
+  switch (f){
+    case 'ult': return 'SIM';
+    case 'grp': return D.grp[j] < 0 ? '' : String(D.grp[j]);
+    case 'tipo': return D.dict.tipo[D.tipo[j]];
+    case 'fa': case 'fe': { const v = D[f][j]; return forCsv ? v.toFixed(2).replace('.', ',') : (v ? nf2.format(v) : ''); }
+    default: return forCsv ? String(D[f][j]) : nf0.format(D[f][j]);
+  }
+}
+const PAGE = 100;
+function renderCons(recalc){
+  if (recalc || !st.list) { st.list = consList(); st.page = 0; }
+  const list = st.list, nR = D.refs.length, labels = D.refs.map(refLabel);
+  const fl = FIELDS.filter(f => visible.has(f.k));
+  const pages = Math.max(1, Math.ceil(list.length / PAGE));
+  st.page = Math.min(st.page, pages - 1);
+  $('#cCount').textContent = `${nf0.format(list.length)} matrículas`;
+  $('#pInfo').textContent = `Página ${st.page + 1} de ${nf0.format(pages)}`;
+  $('#pPrev').disabled = st.page === 0; $('#pNext').disabled = st.page >= pages - 1;
+  const fixed = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO'];
+  let h = '<table><thead><tr>' + fixed.map((t, i) => `<th class="txt${i === 1 ? ' c2' : ''}" rowspan="2">${t}</th>`).join('');
+  if (fl.length) labels.forEach(l => { h += `<th class="grp" colspan="${fl.length}">${l}</th>`; });
+  h += '</tr><tr>';
+  labels.forEach(() => fl.forEach((f, i) => { h += `<th class="${i === 0 ? 'gs' : ''}${f.k === 'tipo' || f.k === 'ult' ? ' txt' : ''}">${f.l}</th>`; }));
+  h += '</tr></thead><tbody>';
+  const start = st.page * PAGE, end = Math.min(list.length, start + PAGE);
+  for (let i = start; i < end; i++){
+    const m = list[i];
+    h += `<tr><td class="txt">${esc(D.mats[m])}</td><td class="txt c2">${esc(D.nomes[m])}</td><td class="txt">${esc(D.dict.cid[D.cid[m]])}</td><td class="txt">${esc(D.dict.sub[D.sub[m]])}</td><td class="txt">${esc(D.dict.sl[D.sl[m]])}</td><td class="txt">${esc(D.dict.sc[D.sc[m]])}</td>`;
+    for (let r = 0; r < nR; r++){
+      const j = m * nR + r;
+      fl.forEach((f, fi) => { h += `<td class="${fi === 0 ? 'gs' : ''}${f.k === 'tipo' || f.k === 'ult' ? ' txt' : ''}">${esc(cellVal(f.k, j))}</td>`; });
+    }
+    h += '</tr>';
+  }
+  if (!list.length) h += `<tr><td class="txt" colspan="${6 + fl.length * nR}">Nenhuma matrícula com esses filtros.</td></tr>`;
+  h += '</tbody></table>';
+  const wrap = $('#tblCons'); wrap.innerHTML = h;
+  const c1 = wrap.querySelector('thead th'); if (c1) wrap.style.setProperty('--c1w', c1.getBoundingClientRect().width + 'px');
+  // mantém a 2ª linha do cabeçalho logo abaixo da 1ª
+  const r1 = wrap.querySelector('thead tr:first-child th.grp');
+  if (r1) wrap.querySelectorAll('thead tr:nth-child(2) th').forEach(th => { th.style.top = r1.getBoundingClientRect().height + 'px'; });
+}
+async function exportCsv(){
+  const list = st.list || consList(), nR = D.refs.length, labels = D.refs.map(refLabel);
+  if (!list.length){ toast('Não há matrículas para exportar com esses filtros.'); return; }
+  overlay(true, 'Gerando o CSV', `${nf0.format(list.length)} matrículas`, 0);
+  const q = s => { s = String(s); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const head = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO'];
+  labels.forEach(l => FIELDS.forEach(f => head.push(`${f.h} ${l}`)));
+  const parts = ['\ufeff' + head.join(';') + '\r\n'];
+  for (let i = 0; i < list.length; i += 5000){
+    let chunk = '';
+    for (let x = i; x < Math.min(list.length, i + 5000); x++){
+      const m = list[x];
+      const row = [D.mats[m], D.nomes[m], D.dict.cid[D.cid[m]], D.dict.sub[D.sub[m]], D.dict.sl[D.sl[m]], D.dict.sc[D.sc[m]]].map(q);
+      for (let r = 0; r < nR; r++) FIELDS.forEach(f => row.push(q(cellVal(f.k, m * nR + r, true))));
+      chunk += row.join(';') + '\r\n';
+    }
+    parts.push(chunk);
+    overlay(true, null, null, i / list.length);
+    await new Promise(r => setTimeout(r));
+  }
+  const url = URL.createObjectURL(new Blob(parts, { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = 'consolidado_esgoto.csv'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  overlay(false);
+}
+
+/* ---------- navegação ---------- */
+function showTab(t){
+  st.tab = t;
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  $('#view-resumo').hidden = t !== 'resumo'; $('#view-cons').hidden = t !== 'cons';
+  $('#metricWrap').hidden = t !== 'resumo';
+  if (t === 'resumo') renderResumo(); else renderCons(true);
+}
+function refresh(){ if (!D) return; st.list = null; if (st.tab === 'resumo') renderResumo(); else renderCons(true); }
+
+$('#btnFiles').onclick = () => $('#inFiles').click();
+$('#btnFolder').onclick = () => $('#inFolder').click();
+$('#inFiles').onchange = e => { loadFiles(e.target.files); e.target.value = ''; };
+$('#inFolder').onchange = e => { loadFiles(e.target.files); e.target.value = ''; };
+$('#btnClear').onclick = async () => {
+  if (!confirm('Apagar a base guardada neste navegador? Os arquivos no seu computador não são afetados.')) return;
+  try { await idbClear(); } catch (_) {}
+  location.reload();
+};
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$('#fCid').onchange = e => { st.cid = +e.target.value; refresh(); };
+$('#fSub').onchange = e => { st.sub = +e.target.value; refresh(); };
+document.querySelectorAll('[data-metric]').forEach(b => b.onclick = () => {
+  st.metric = b.dataset.metric;
+  document.querySelectorAll('[data-metric]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderResumo();
+});
+document.addEventListener('click', e => {
+  const th = e.target.closest('th.sortable'); if (!th) return;
+  st[th.dataset.key] = th.dataset.sort; renderResumo();
+});
+$('#chips').onclick = e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const f = c.dataset.f; if (visible.has(f)) visible.delete(f); else visible.add(f);
+  c.setAttribute('aria-pressed', String(visible.has(f))); renderCons(false);
+};
+let tSearch; $('#cSearch').oninput = () => { clearTimeout(tSearch); tSearch = setTimeout(() => renderCons(true), 250); };
+$('#cMov').onchange = () => renderCons(true);
+$('#cSort').onchange = () => renderCons(true);
+$('#pPrev').onclick = () => { st.page--; renderCons(false); $('#tblCons').scrollTop = 0; };
+$('#pNext').onclick = () => { st.page++; renderCons(false); $('#tblCons').scrollTop = 0; };
+$('#btnExport').onclick = exportCsv;
+
+const drop = $('#drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => loadFiles(e.dataTransfer.files));
+
+// abre com a última base guardada
+(async () => {
+  try {
+    const d = await idbLoad();
+    if (d && d.refs) setData(d);
+  } catch (_) {}
+})();
+})();
+</script>
+</body>
+</html>
