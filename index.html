@@ -11,16 +11,18 @@
 :root{
   --bg:#EEF3F4; --surface:#FFFFFF; --ink:#13303A; --muted:#5B7480; --line:#D3DFE2; --line-strong:#B5C7CC;
   --water:#0E5A8A; --water-soft:#DCEAF3;
-  --gain:#17805F; --gain-soft:#DCF0E7; --loss:#B8403A; --loss-soft:#F6E1DF; --adj:#9FB5BD; --warn:#8A5A00; --warn-soft:#FBEBC8;
+  --gain:#17805F; --gain-soft:#DCF0E7; --loss:#B8403A; --loss-soft:#F6E1DF; --adj:#9FB5BD; --gain2:#7CC4A6; --warn:#8A5A00; --warn-soft:#FBEBC8;
   --font:'Barlow',system-ui,'Segoe UI',Roboto,Arial,sans-serif;
   --num:'Barlow Semi Condensed','Barlow',system-ui,'Segoe UI',Arial,sans-serif;
+  --head:#173B5E; --head-2:#1F4A73; --head-text:#C8D4EA; --head-soft:#D5E0F2;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#0E1C21; --surface:#14282F; --ink:#E2ECEE; --muted:#93AAB2; --line:#24404A; --line-strong:#33545F;
     --water:#62AADB; --water-soft:#163A4E;
-    --gain:#4CC395; --gain-soft:#163A2F; --loss:#EE7D74; --loss-soft:#422524; --adj:#557883; --warn:#F2C46B; --warn-soft:#3D3215;
+    --gain:#4CC395; --gain-soft:#163A2F; --loss:#EE7D74; --loss-soft:#422524; --adj:#557883; --gain2:#2C7A5D; --warn:#F2C46B; --warn-soft:#3D3215;
+    --head:#0F2A40; --head-2:#163752;
     color-scheme:dark;
   }
 }
@@ -32,10 +34,11 @@ button,select,input{font:inherit;color:inherit}
 .num{font-family:var(--num);font-variant-numeric:tabular-nums}
 
 /* Cabeçalho */
-.top{background:var(--surface);border-bottom:1px solid var(--line)}
+.top{background:var(--head);color:#fff}
+.top :focus-visible{outline-color:#fff}
 .top-in{max-width:1400px;margin:0 auto;padding:18px 24px 0;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
 .brand h1{margin:0;font-family:var(--num);font-weight:700;font-size:26px;letter-spacing:-.01em}
-.brand p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.brand p{margin:2px 0 0;color:var(--head-text);font-size:14px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .btn{border:1px solid var(--line-strong);background:var(--surface);padding:7px 14px;border-radius:6px;cursor:pointer;font-weight:500}
 .btn:hover{border-color:var(--water)}
@@ -43,9 +46,27 @@ button,select,input{font:inherit;color:inherit}
 @media (prefers-color-scheme: dark){.btn.primary{color:#0E1C21}}
 .btn.quiet{border-color:transparent;color:var(--muted)}
 .btn.quiet:hover{color:var(--loss);border-color:transparent}
-.tabs{max-width:1400px;margin:0 auto;padding:14px 24px 0;display:flex;gap:4px}
-.tab{border:0;background:none;padding:10px 16px 12px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:3px solid transparent}
-.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--water)}
+.top .btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;font-weight:600}
+.top .btn:hover{background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.5)}
+.top .btn.primary{background:#fff;border-color:#fff;color:var(--head)}
+.top .btn.primary:hover{background:var(--head-soft)}
+.top .btn.quiet{background:none;border-color:transparent;color:var(--head-text);font-weight:500}
+.top .btn.quiet:hover{color:#FFC9A0}
+.top .btn:disabled{opacity:.45;cursor:default}
+.fonte{max-width:1400px;margin:0 auto;padding:8px 24px 0;color:var(--head-text);font-size:13.5px}
+.fonte b{color:#fff;font-weight:600}
+.progresso{max-width:1400px;margin:0 auto;padding:12px 24px 2px}
+.prog-linha{display:flex;align-items:center;gap:12px;font-size:.88rem;color:var(--head-soft);flex-wrap:wrap}
+.prog-linha .barra{flex:0 1 320px;width:320px;height:8px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden}
+.barra-fill{height:100%;width:0;background:#7CC4A6;transition:width .2s}
+.prog-linha b{color:#fff;font-variant-numeric:tabular-nums;min-width:38px}
+.progresso .nota{color:var(--head-text);margin:4px 0 0;font-size:13px;min-height:1.2em}
+.progresso.erro #statusTexto,.progresso.erro .nota{color:#FFC9A0}
+.progresso.erro .barra,.progresso.erro #statusPct{display:none}
+.tabs{max-width:1400px;margin:0 auto;padding:10px 24px 0;display:flex;gap:4px}
+.tab{border:0;background:none;padding:10px 16px 12px;cursor:pointer;color:var(--head-text);font-weight:600;border-bottom:3px solid transparent}
+.tab:hover{color:#fff}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:#7CC4A6}
 
 /* Barra de filtros */
 .filters{max-width:1400px;margin:0 auto;padding:16px 24px 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
@@ -102,6 +123,26 @@ td.chg-in{background:var(--gain-soft)}
 td.chg-out{background:var(--loss-soft)}
 .note{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:18px 0 0;padding:10px 14px;border-left:4px solid var(--warn);background:var(--warn-soft);border-radius:4px}
 .note span{color:var(--ink)}
+.timeline{list-style:none;margin:0;padding:6px 0 4px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(118px,1fr);overflow-x:auto;position:relative}
+.tl-item{position:relative;padding:28px 10px 6px 0}
+.tl-item::before{content:"";position:absolute;top:8px;left:0;right:0;height:2px;background:var(--line-strong)}
+.tl-item:first-child::before{left:7px}
+.tl-item:last-child::before{right:auto;width:8px}
+.tl-dot{position:absolute;top:2px;left:0;width:14px;height:14px;border-radius:50%;background:var(--gain);border:3px solid var(--bg)}
+.tl-base .tl-dot{background:var(--water)}
+.tl-month{font-family:var(--num);font-weight:600;color:var(--muted);font-size:14px}
+.tl-big{font-family:var(--num);font-weight:700;font-size:30px;line-height:1.05;color:var(--gain);margin-top:2px}
+.tl-base .tl-big{color:var(--ink)}
+.tl-cap{font-size:13px;color:var(--muted);line-height:1.3;max-width:16ch}
+.tl-split{font-size:12.5px;color:var(--muted);margin-top:4px}
+.timeline dl{margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+.timeline dl div{margin-bottom:6px}
+.timeline dt{font-size:12px;color:var(--muted)}
+.timeline dd{margin:0;font-family:var(--num);font-weight:600;font-size:16px}
+.timeline dd.g{color:var(--gain)}
+.timeline .muted dd{color:var(--muted);font-weight:500}
+tr.strong td{font-weight:700}
+tr.sub td:first-child{padding-left:28px;color:var(--muted)}
 .keyline{font-size:13px;color:var(--muted);margin:0 0 8px}
 .keyline i{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid var(--line-strong);margin:0 6px 0 14px;vertical-align:-1px}
 .keyline i:first-child{margin-left:0}
@@ -132,10 +173,6 @@ td.chg-out{background:var(--loss-soft)}
 .empty li{margin:4px 0}
 .drop{margin-top:22px;border:2px dashed var(--line-strong);border-radius:10px;padding:28px;text-align:center;color:var(--muted)}
 .drop.over{border-color:var(--water);background:var(--water-soft)}
-.overlay{position:fixed;inset:0;background:rgba(10,25,30,.55);display:flex;align-items:center;justify-content:center;z-index:50}
-.overlay-box{background:var(--surface);border-radius:10px;padding:24px 28px;width:min(460px,90vw)}
-.overlay-box h3{margin:0 0 6px;font-family:var(--num);font-size:20px}
-.overlay-box p{margin:0 0 14px;color:var(--muted);font-size:14px;min-height:2.9em}
 .bar{height:8px;background:var(--water-soft);border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--water);transition:width .2s}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:8px;z-index:60;font-size:14px;max-width:90vw}
@@ -146,7 +183,7 @@ td.chg-out{background:var(--loss-soft)}
   .stats{border-left:0}
   .stat{padding:10px 12px 10px 0}
 }
-@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+@media (prefers-reduced-motion: reduce){.barra-fill{transition:none}}
 </style>
 </head>
 <body>
@@ -158,12 +195,18 @@ td.chg-out{background:var(--loss-soft)}
       <p id="status">Nenhuma base carregada</p>
     </div>
     <div class="actions">
-      <button class="btn primary" id="btnFiles" type="button">Carregar arquivos</button>
-      <button class="btn" id="btnFolder" type="button">Carregar pasta</button>
+      <button class="btn primary" id="btnFolder" type="button">📁 Conectar pasta</button>
+      <button class="btn" id="btnUpdate" type="button" hidden>↻ Atualizar</button>
+      <button class="btn" id="btnFiles" type="button">📄 Carregar arquivo</button>
       <button class="btn quiet" id="btnClear" type="button" hidden>Apagar dados do navegador</button>
       <input type="file" id="inFiles" accept=".xlsx" multiple hidden>
       <input type="file" id="inFolder" webkitdirectory multiple hidden>
     </div>
+  </div>
+  <div class="fonte" id="fonte">Nenhuma pasta conectada.</div>
+  <div class="progresso" id="progresso" hidden role="status" aria-live="polite">
+    <div class="prog-linha"><div class="barra"><div class="barra-fill" id="barraFill"></div></div><b id="statusPct">0%</b><span id="statusTexto">Preparando…</span></div>
+    <p class="nota" id="statusNota"></p>
   </div>
   <nav class="tabs" role="tablist" id="tabs" hidden>
     <button class="tab" role="tab" aria-selected="true" data-tab="resumo" id="tab-resumo">Resumo</button>
@@ -187,7 +230,8 @@ td.chg-out{background:var(--loss-soft)}
     <h2>Carregue a base para começar</h2>
     <p>O painel lê os arquivos .xlsx direto do seu computador. Nada é enviado para a internet: os dados ficam guardados só neste navegador até você carregar uma base nova.</p>
     <ol>
-      <li>Use um arquivo com todas as abas ou uma pasta com vários arquivos.</li>
+      <li>Clique em 📁 Conectar pasta e escolha a pasta com os arquivos .xlsx. Nas próximas vezes, é só clicar em ↻ Atualizar.</li>
+      <li>Também dá para usar 📄 Carregar arquivo com um único .xlsx que tenha todas as abas.</li>
       <li>Cada aba precisa ter as colunas NUM_LIGACAO, Referência, ULTIMO_CONTRATO e as colunas de faturamento e economias.</li>
       <li>Só as linhas com ULTIMO_CONTRATO = SIM entram na análise.</li>
     </ol>
@@ -205,17 +249,21 @@ td.chg-out{background:var(--loss-soft)}
     </div>
     <div class="note" id="divNote" hidden><span id="divTxt"></span><button class="btn" id="btnDiv" type="button">Ver no consolidado</button></div>
 
+    <h2>Linha do tempo de 2026</h2>
+    <p class="lead">Economias que passaram a faturar esgoto em cada mês, o faturamento de esgoto dessas economias e o faturamento de esgoto total do mês.</p>
+    <ol class="timeline" id="timeline"></ol>
+
     <h2 id="t1"></h2>
     <p class="lead" id="l1"></p>
     <div class="panel chart" id="chartCombo"></div>
 
     <h2>Mês a mês</h2>
-    <p class="lead" id="lMes"></p>
+    <p class="lead">Cada ligação conta só na primeira vez que passa a faturar esgoto. Aumento de economias em quem já pagava também soma.</p>
     <div class="tbl-wrap" id="tblMes"></div>
 
-    <h2>De onde vem a variação de cada mês</h2>
-    <p class="lead" id="lMov"></p>
-    <div class="panel chart" id="chartMov"></div>
+    <h2>Para conhecimento</h2>
+    <p class="lead">Economias que saíram ou voltaram a faturar esgoto. Não são descontadas nem somadas ao total de 2026.</p>
+    <div class="tbl-wrap" id="tblInfo"></div>
 
     <h2>Por sub-categoria</h2>
     <p class="lead" id="lSub"></p>
@@ -234,8 +282,8 @@ td.chg-out{background:var(--loss-soft)}
       <label class="field">Movimento do esgoto
         <select id="cMov">
           <option value="all">Todas as matrículas</option>
-          <option value="entrou_ano">Passou a pagar esgoto em 2026 (saldo do ano)</option>
-          <option value="saiu_ano">Deixou de pagar esgoto em 2026 (saldo do ano)</option>
+          <option value="entrou_ano">Passou a faturar esgoto em 2026</option>
+          <option value="saiu_ano">Deixou de faturar esgoto em algum mês</option>
           <option value="entrou_mes">Passou a pagar em um mês</option>
           <option value="saiu_mes">Deixou de pagar em um mês</option>
           <option value="diverg">Economias de esgoto divergentes</option>
@@ -269,13 +317,6 @@ td.chg-out{background:var(--loss-soft)}
   </section>
 </main>
 
-<div class="overlay" id="overlay" hidden>
-  <div class="overlay-box" role="status" aria-live="polite">
-    <h3 id="ovTitle">Lendo a base</h3>
-    <p id="ovMsg">Preparando…</p>
-    <div class="bar"><i id="ovBar"></i></div>
-  </div>
-</div>
 
 <!-- ===================== Worker: lê os .xlsx sem travar a tela ===================== -->
 <script type="text/plain" id="worker-src">
@@ -595,11 +636,23 @@ function toast(msg){
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; t.setAttribute('role', 'status');
   document.body.appendChild(t); setTimeout(() => t.remove(), 4500);
 }
-function overlay(show, title, msg, pct){
-  $('#overlay').hidden = !show; if (!show) return;
-  if (title != null) $('#ovTitle').textContent = title;
-  if (msg != null) $('#ovMsg').textContent = msg;
-  if (pct != null) $('#ovBar').style.width = Math.round(pct * 100) + '%';
+let rodando = false;
+function prog(show, title, msg, pct){
+  const p = $('#progresso');
+  p.hidden = !show; if (!show) return;
+  p.classList.remove('erro');
+  if (title != null) $('#statusTexto').textContent = title;
+  if (msg != null) $('#statusNota').textContent = msg;
+  if (pct != null){ const v = Math.round(Math.max(0, Math.min(1, pct)) * 100); $('#barraFill').style.width = v + '%'; $('#statusPct').textContent = v + '%'; }
+}
+function progErro(msg, detalhe){
+  const p = $('#progresso'); p.hidden = false; p.classList.add('erro');
+  $('#statusTexto').textContent = msg; $('#statusNota').textContent = detalhe || '';
+  bloqueia(false);
+}
+function bloqueia(sim){
+  rodando = sim;
+  ['#btnFolder', '#btnUpdate', '#btnFiles', '#btnClear', '#btnExport'].forEach(id => { const b = $(id); if (b) b.disabled = sim; });
 }
 
 /* ---------- armazenamento no navegador ---------- */
@@ -619,34 +672,38 @@ async function idbDo(mode, fn){
 }
 const idbSave = v => idbDo('readwrite', s => s.put(v, 'atual'));
 const idbLoad = () => idbDo('readonly', s => s.get('atual'));
-const idbClear = () => idbDo('readwrite', s => s.delete('atual'));
+const idbClear = () => idbDo('readwrite', s => { s.delete('pasta'); return s.delete('atual'); });
+const idbSavePasta = h => idbDo('readwrite', s => s.put(h, 'pasta'));
+const idbLoadPasta = () => idbDo('readonly', s => s.get('pasta'));
 
 /* ---------- carregamento ---------- */
-function loadFiles(list){
+function loadFiles(list, fonte){
+  if (rodando) return;
   const files = [...list].filter(f => /\.xlsx$/i.test(f.name) && !f.name.startsWith('~$'));
-  if (!files.length){ toast('Nenhum arquivo .xlsx encontrado na seleção.'); return; }
+  if (!files.length){ progErro('Nenhum arquivo .xlsx encontrado.', 'Confira se a pasta ou a seleção tem os arquivos exportados da base.'); return; }
   files.sort((a, b) => (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name));
   let worker;
   try {
     const src = $('#worker-src').textContent;
     worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
-  } catch (e){ toast('O navegador bloqueou o processamento. Use o Chrome ou o Edge atualizados.'); return; }
-  overlay(true, 'Lendo a base', 'Preparando…', 0);
+  } catch (e){ progErro('O navegador bloqueou o processamento.', 'Use o Chrome ou o Edge atualizados.'); return; }
+  bloqueia(true);
+  prog(true, 'Lendo a base', 'Preparando…', 0);
   worker.onmessage = async ev => {
     const m = ev.data;
-    if (m.type === 'progress') overlay(true, m.title, m.msg, m.pct);
-    else if (m.type === 'error'){ worker.terminate(); overlay(false); toast(m.message); }
+    if (m.type === 'progress') prog(true, m.title, m.msg, m.pct);
+    else if (m.type === 'error'){ worker.terminate(); progErro('Não foi possível ler a base.', m.message); }
     else if (m.type === 'done'){
       worker.terminate();
       const d = m.data;
-      d.meta = { arquivos: files.map(f => f.name), carregadoEm: new Date().toISOString() };
-      overlay(true, 'Guardando no navegador', 'Assim você não precisa carregar de novo na próxima vez.', 1);
+      d.meta = { arquivos: files.map(f => f.name), carregadoEm: new Date().toISOString(), fonte: fonte || (files.length > 1 ? files.length + ' arquivos' : files[0].name) };
+      prog(true, 'Guardando no navegador', 'Assim a base abre direto na próxima vez.', 1);
       try { await idbSave(d); } catch (e){ toast('Os dados não puderam ser guardados no navegador e valem só nesta sessão.'); }
-      overlay(false);
+      prog(false); bloqueia(false);
       setData(d);
     }
   };
-  worker.onerror = e => { overlay(false); toast('Erro ao ler os arquivos: ' + (e.message || 'verifique o formato.')); };
+  worker.onerror = e => { progErro('Não foi possível ler os arquivos.', e.message || 'Verifique se são arquivos .xlsx válidos.'); };
   worker.postMessage({ files });
 }
 
@@ -662,7 +719,7 @@ function setData(d){
   st.cid = -1; st.sub = -1; st.page = 0;
   const first = refLabel(D.refs[0]), last = refLabel(D.refs[D.refs.length - 1]);
   const dt = new Date(D.meta.carregadoEm);
-  $('#status').textContent = `${nf0.format(nM)} matrículas, ${D.refs.length} referências (${first} a ${last}). Carregado em ${dt.toLocaleDateString('pt-BR')} às ${dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.`;
+  $('#status').textContent = `${D.refs.length} referências (${first} a ${last}), carregadas em ${dt.toLocaleDateString('pt-BR')} às ${dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} a partir de ${D.meta.fonte || 'arquivos'}.`;
   $('#empty').hidden = true; $('#tabs').hidden = false; $('#filters').hidden = false; $('#btnClear').hidden = false;
   buildChips();
   showTab(st.tab);
@@ -680,9 +737,10 @@ function keepMask(){
 }
 // Marca, para cada matrícula e referência, se o tipo de faturamento inclui esgoto e se há divergência de economias
 function derive(){
-  const nM = D.mats.length, nR = D.refs.length, L = nR - 1, N = nM * nR;
+  const nM = D.mats.length, nR = D.refs.length, N = nM * nR;
   const esg = D.dict.tipo.map(t => /ESGOTO/.test(String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()));
-  D.hasE = new Uint8Array(N); D.div = new Uint8Array(N); D.divN = new Uint16Array(nM); D.yStat = new Uint8Array(nM);
+  D.hasE = new Uint8Array(N); D.div = new Uint8Array(N); D.divN = new Uint16Array(nM);
+  D.yStat = new Uint8Array(nM); D.anyOut = new Uint8Array(nM); D.entra = new Int16Array(nM).fill(-1);
   for (let m = 0; m < nM; m++){
     const b = m * nR;
     for (let r = 0; r < nR; r++){
@@ -692,41 +750,48 @@ function derive(){
       else if (!h && D.qe[j] > 0) D.div[j] = 2;            // economias de esgoto sem tipo com esgoto
       if (D.div[j]) D.divN[m]++;
     }
-    const h0 = D.hasE[b], hL = D.hasE[b + L];
-    D.yStat[m] = h0 && hL ? 1 : !h0 && hL ? 2 : h0 && !hL ? 3 : 0;
+    let entered = D.hasE[b] === 1;
+    for (let r = 1; r < nR; r++){
+      const h = D.hasE[b + r], p = D.hasE[b + r - 1];
+      if (h && !p && !entered){ entered = true; D.entra[m] = r; }
+      if (!h && p) D.anyOut[m] = 1;
+    }
+    D.yStat[m] = D.entra[m] > 0 ? 2 : D.anyOut[m] ? 3 : D.hasE[b] ? 1 : 0;
   }
 }
-function flows(k, A){
-  const nR = D.refs.length, L = nR - 1, P = D.present, H = D.hasE, Q = D.qe;
-  const z = () => new Float64Array(nR);
-  const o = { stock: z(), inMat: z(), inVal: z(), outMat: z(), outVal: z(), divMat: z(), yIn: 0, yInEco: 0, yOut: 0, yOutEco: 0 };
+// Entradas de economias de esgoto (primeira troca para AGUA E ESGOTO + aumento em quem já pagava)
+// e, só para conhecimento, saídas, reduções e reentradas
+function fluxos(k){
+  const nR = D.refs.length, P = D.present, H = D.hasE, Q = D.qe, F = D.fe;
+  const nC = D.dict.cid.length, nS = D.dict.sub.length, z = n => new Float64Array(n);
+  const o = { nov: z(nR), aum: z(nR), fatNov: z(nR), fatAum: z(nR), fatTot: z(nR), ecoTot: z(nR), sai: z(nR), red: z(nR), ree: z(nR), divMat: z(nR),
+    cidE: z(nC * nR), cidF: z(nC * nR), cidS: z(nC), subE: z(nS * nR), subF: z(nS * nR), subS: z(nS),
+    cidUsed: new Uint8Array(nC), subUsed: new Uint8Array(nS) };
   for (let m = 0, n = D.mats.length; m < n; m++){
     if (!k[m]) continue;
-    const b = m * nR;
+    const b = m * nR, c = D.cid[m], s = D.sub[m];
+    o.cidUsed[c] = 1; o.subUsed[s] = 1;
     for (let r = 0; r < nR; r++){
-      const j = b + r, v = P[j] ? A[j] : 0;
-      o.stock[r] += v;
+      const j = b + r;
+      if (P[j]){ o.fatTot[r] += F[j]; o.ecoTot[r] += Q[j]; }
       if (D.div[j]) o.divMat[r]++;
-      if (r){
-        const h = H[j], p = H[j - 1];
-        if (h && !p){ o.inMat[r]++; o.inVal[r] += v; }
-        else if (!h && p){ o.outMat[r]++; o.outVal[r] += P[j - 1] ? A[j - 1] : 0; }
+      if (!r) continue;
+      const h = H[j], p = H[j - 1];
+      let e = 0, f = 0, out = 0;
+      if (h && !p){
+        if (D.entra[m] === r){ e = Q[j]; f = F[j]; o.nov[r] += e; o.fatNov[r] += f; }
+        else o.ree[r] += Q[j];
+      } else if (!h && p){ out = Q[j - 1]; o.sai[r] += out; }
+      else if (h && p){
+        const d = Q[j] - Q[j - 1];
+        if (d > 0){ e = d; f = Q[j] ? F[j] * d / Q[j] : 0; o.aum[r] += d; o.fatAum[r] += f; }
+        else if (d < 0){ out = -d; o.red[r] += out; }
       }
+      if (e || f){ o.cidE[c * nR + r] += e; o.cidF[c * nR + r] += f; o.subE[s * nR + r] += e; o.subF[s * nR + r] += f; }
+      if (out){ o.cidS[c] += out; o.subS[s] += out; }
     }
-    const h0 = H[b], hL = H[b + L];
-    if (!h0 && hL){ o.yIn++; o.yInEco += Q[b + L]; }
-    else if (h0 && !hL){ o.yOut++; o.yOutEco += Q[b]; }
   }
   return o;
-}
-function bySegment(k, seg, nSeg, A){
-  const nR = D.refs.length, P = D.present, out = new Float64Array(nSeg * nR);
-  for (let m = 0, n = D.mats.length; m < n; m++){
-    if (!k[m]) continue;
-    const b = m * nR, s = seg[m] * nR;
-    for (let r = 0; r < nR; r++) if (P[b + r]) out[s + r] += A[b + r];
-  }
-  return out;
 }
 
 /* ---------- gráficos SVG ---------- */
@@ -799,131 +864,138 @@ function spark(vals){
 }
 
 /* ---------- Resumo ---------- */
+const sumFrom1 = a => { let t = 0; for (let i = 1; i < a.length; i++) t += a[i]; return t; };
 function renderResumo(){
   const k = keepMask(), nR = D.refs.length, L = nR - 1, labels = D.refs.map(refLabel);
   const first = labels[0], last = labels[L];
-  const eco = flows(k, D.qe), fat = flows(k, D.fe);
-  const netEco = eco.stock[L] - eco.stock[0], netFat = fat.stock[L] - fat.stock[0];
+  const o = fluxos(k);
+  const ent = labels.map((_, r) => r ? o.nov[r] + o.aum[r] : 0);
+  const fEnt = labels.map((_, r) => r ? o.fatNov[r] + o.fatAum[r] : 0);
+  const totNov = sumFrom1(o.nov), totAum = sumFrom1(o.aum), total = totNov + totAum, totFat = sumFrom1(fEnt);
+  const totSai = sumFrom1(o.sai) + sumFrom1(o.red), totRee = sumFrom1(o.ree);
 
-  const hb = $('#heroBig'); hb.textContent = signed(netEco, v => nf0.format(v)); hb.className = 'hero-big ' + cls(netEco);
-  $('#heroLabel').textContent = netEco >= 0 ? 'economias de esgoto a mais em 2026' : 'economias de esgoto a menos em 2026';
-  $('#heroSub').textContent = `Saldo de ${first} a ${last}: de ${nf0.format(eco.stock[0])} para ${nf0.format(eco.stock[L])} economias faturadas com esgoto.`;
-  const pct = eco.stock[0] ? netEco / eco.stock[0] * 100 : 0;
-  const color = c => c === 'pos' ? 'color:var(--gain)' : c === 'neg' ? 'color:var(--loss)' : '';
+  const hb = $('#heroBig'); hb.textContent = (total > 0 ? '+' : '') + nf0.format(total); hb.className = 'hero-big ' + (total > 0 ? 'pos' : '');
+  $('#heroLabel').textContent = 'economias passaram a faturar esgoto em 2026';
+  $('#heroSub').textContent = `${nf0.format(totNov)} pela troca de AGUA para AGUA E ESGOTO e ${nf0.format(totAum)} por aumento em quem já pagava, de ${labels[1]} a ${last}. Saídas não são descontadas.`;
+  const pctF = o.fatTot[0] ? (o.fatTot[L] - o.fatTot[0]) / o.fatTot[0] * 100 : 0;
   $('#stats').innerHTML = [
-    [signed(netFat, v => brl0.format(v)), `faturamento de esgoto a ${netFat >= 0 ? 'mais' : 'menos'} por mês (${last} contra ${first})`, cls(netFat)],
-    [signed(pct, v => nf1.format(v) + '%'), `variação sobre a base de ${first}`, cls(pct)],
-    [nf0.format(eco.yIn), `matrículas passaram de AGUA para AGUA E ESGOTO, com ${nf0.format(eco.yInEco)} economias em ${last}`, ''],
-    [nf0.format(eco.yOut), `matrículas voltaram para só AGUA, com ${nf0.format(eco.yOutEco)} economias em ${first}`, '']
-  ].map(([b, s, c]) => `<div class="stat"><b class="num" style="${color(c)}">${b}</b><span>${s}</span></div>`).join('');
+    [brl0.format(totFat), 'faturamento de esgoto dessas economias no mês em que entraram, somado no ano', 'color:var(--gain)'],
+    [brl0.format(o.fatTot[L]), `faturamento de esgoto total em ${last}, ${signed(pctF, v => nf1.format(v) + '%')} sobre ${first}`, ''],
+    [nf0.format(totSai), 'economias deixaram de faturar esgoto (só para conhecimento)', 'color:var(--muted)'],
+    [nf0.format(totRee), 'economias voltaram a faturar esgoto e não entram no total', 'color:var(--muted)']
+  ].map(([b, s, c]) => `<div class="stat"><b class="num" style="${c}">${b}</b><span>${s}</span></div>`).join('');
 
-  const dL = eco.divMat[L], note = $('#divNote');
+  const dL = o.divMat[L], note = $('#divNote');
   note.hidden = !dL;
-  if (dL) $('#divTxt').textContent = `${nf0.format(dL)} matrículas em ${last} têm economias de esgoto diferentes do total de economias, ou economias de esgoto sem faturamento de esgoto.`;
+  if (dL) $('#divTxt').textContent = `Em ${last}, ${nf0.format(dL)} ligações têm economias de esgoto diferentes do total de economias, ou economias de esgoto sem faturamento de esgoto. Vale conferir antes de fechar os números.`;
 
-  const money = st.metric === 'fat', S = money ? fat : eco;
-  const fmt = money ? (v => signed(v, x => brl.format(x))) : (v => signed(v, x => nf0.format(x)));
-  const lab = money ? (v => signed(v, x => shortFmt(x, false))) : (v => signed(v, x => nf0.format(x)));
-  const what = money ? 'faturamento de esgoto' : 'economias de esgoto';
-
-  $('#t1').textContent = money ? 'Faturamento de esgoto: variação mês a mês' : 'Economias de esgoto: variação mês a mês';
-  $('#l1').textContent = `Barras: diferença para o mês anterior. Linha: acumulado desde ${first}.`;
-  const varM = labels.map((_, r) => r ? S.stock[r] - S.stock[r - 1] : null);
-  const acc = labels.map((_, r) => S.stock[r] - S.stock[0]);
-  chart($('#chartCombo'), labels, [
-    { type: 'bar', name: 'Variação', values: varM, color: v => v >= 0 ? 'var(--gain)' : 'var(--loss)', label: true },
-    { type: 'line', name: 'Acumulado', values: acc, color: 'var(--water)' }
-  ], { money, fmt, lab, aria: 'Variação mensal e acumulado de ' + what,
-       legend: [['var(--gain)', 'Aumento no mês'], ['var(--loss)', 'Redução no mês'], ['var(--water)', 'Acumulado desde ' + first]] });
-
-  const ins = [], outs = [], adj = [], net = [];
+  // Linha do tempo
+  let tl = `<li class="tl-item tl-base"><span class="tl-dot"></span><div class="tl-month">${first}</div>
+    <div class="tl-big">${nf0.format(o.ecoTot[0])}</div><div class="tl-cap">economias com esgoto na base</div><div class="tl-split">&nbsp;<br>&nbsp;</div>
+    <dl><div><dt>Faturamento de esgoto do mês</dt><dd>${brl0.format(o.fatTot[0])}</dd></div></dl></li>`;
   for (let r = 1; r < nR; r++){
-    const v = S.stock[r] - S.stock[r - 1];
-    ins.push(S.inVal[r]); outs.push(-S.outVal[r]); adj.push(v - S.inVal[r] + S.outVal[r]); net.push(v);
+    tl += `<li class="tl-item"><span class="tl-dot"></span><div class="tl-month">${labels[r]}</div>
+      <div class="tl-big">+${nf0.format(ent[r])}</div><div class="tl-cap">novas economias com esgoto</div>
+      <div class="tl-split">${nf0.format(o.nov[r])} por troca<br>${nf0.format(o.aum[r])} por aumento</div>
+      <dl><div><dt>Faturamento das novas</dt><dd class="g">${brl0.format(fEnt[r])}</dd></div>
+      <div><dt>Faturamento de esgoto do mês</dt><dd>${brl0.format(o.fatTot[r])}</dd></div>
+      <div class="muted"><dt>Deixaram de faturar</dt><dd>${nf0.format(o.sai[r] + o.red[r])}</dd></div></dl></li>`;
   }
-  $('#lMov').textContent = money
-    ? 'Verde: faturamento de esgoto das matrículas que passaram de AGUA para AGUA E ESGOTO no mês. Vermelho: das que voltaram para só AGUA (valor do mês anterior). Cinza: variação de faturamento em quem já pagava esgoto. A linha é a variação total do mês.'
-    : 'Verde: economias de esgoto das matrículas que passaram de AGUA para AGUA E ESGOTO no mês. Vermelho: das que voltaram para só AGUA. Cinza: aumento ou redução de economias em quem já pagava esgoto. A linha é a variação total do mês.';
-  chart($('#chartMov'), labels.slice(1), [
-    { type: 'bar', name: 'Passaram a pagar', values: ins, color: 'var(--gain)' },
-    { type: 'bar', name: 'Deixaram de pagar', values: outs, color: 'var(--loss)' },
-    { type: 'bar', name: 'Ajuste em quem já pagava', values: adj, color: 'var(--adj)' },
-    { type: 'line', name: 'Variação total', values: net, color: 'var(--water)' }
-  ], { money, fmt, lab, stacked: true, h: 260, aria: 'Origem da variação mensal de ' + what,
-       legend: [['var(--gain)', 'Passaram a pagar esgoto'], ['var(--loss)', 'Deixaram de pagar esgoto'], ['var(--adj)', 'Ajuste em quem já pagava'], ['var(--water)', 'Variação total']] });
+  $('#timeline').innerHTML = tl;
+
+  // Gráfico
+  const money = st.metric === 'fat';
+  const fmt = money ? (v => brl.format(v)) : (v => nf0.format(v));
+  const lab = money ? (v => shortFmt(v, false)) : (v => nf0.format(v));
+  const L1 = labels.slice(1);
+  if (money){
+    $('#t1').textContent = 'Faturamento de esgoto das novas economias';
+    $('#l1').textContent = 'Faturamento de esgoto, no mês em que entraram, das economias que passaram a faturar esgoto. No aumento em quem já pagava, entra a parte do faturamento proporcional às economias novas.';
+    chart($('#chartCombo'), L1, [
+      { type: 'bar', name: 'Troca de AGUA para AGUA E ESGOTO', values: L1.map((_, i) => o.fatNov[i + 1]), color: 'var(--gain)' },
+      { type: 'bar', name: 'Aumento em quem já pagava', values: L1.map((_, i) => o.fatAum[i + 1]), color: 'var(--gain2)' }
+    ], { money, fmt, lab, stacked: true, aria: 'Faturamento de esgoto das novas economias por mês',
+         legend: [['var(--gain)', 'Troca de AGUA para AGUA E ESGOTO'], ['var(--gain2)', 'Aumento em quem já pagava']] });
+  } else {
+    $('#t1').textContent = 'Economias que passaram a faturar esgoto';
+    $('#l1').textContent = `Barras: entradas de cada mês. Linha: total acumulado desde ${labels[1]}.`;
+    let acc = 0; const accA = L1.map((_, i) => (acc += ent[i + 1]));
+    chart($('#chartCombo'), L1, [
+      { type: 'bar', name: 'Troca de AGUA para AGUA E ESGOTO', values: L1.map((_, i) => o.nov[i + 1]), color: 'var(--gain)' },
+      { type: 'bar', name: 'Aumento em quem já pagava', values: L1.map((_, i) => o.aum[i + 1]), color: 'var(--gain2)' },
+      { type: 'line', name: 'Acumulado', values: accA, color: 'var(--water)' }
+    ], { money, fmt, lab, stacked: true, aria: 'Economias que passaram a faturar esgoto por mês',
+         legend: [['var(--gain)', 'Troca de AGUA para AGUA E ESGOTO'], ['var(--gain2)', 'Aumento em quem já pagava'], ['var(--water)', 'Acumulado em 2026']] });
+  }
 
   // Tabela mês a mês
-  const f = money ? (v => brl0.format(v)) : (v => nf0.format(v));
-  const fs = money ? (v => signed(v, x => brl0.format(x))) : (v => signed(v, x => nf0.format(x)));
-  const fi = v => nf0.format(v);
-  $('#lMes').textContent = 'Passar a pagar ou deixar de pagar é medido pela troca do TIPO_FATURAMENTO entre AGUA e AGUA E ESGOTO, comparando com o mês anterior.';
-  const td = (v, f2) => `<td class="${cls(v)}">${f2(v)}</td>`;
-  const rows = [
-    [money ? 'Faturamento de esgoto no mês' : 'Economias de esgoto no mês', r => `<td>${f(S.stock[r])}</td>`],
-    ['Variação no mês', r => r ? td(S.stock[r] - S.stock[r - 1], fs) : '<td class="base">base</td>'],
-    ['Matrículas que passaram a pagar', r => r ? `<td>${fi(eco.inMat[r])}</td>` : '<td></td>'],
-    [money ? 'Faturamento de quem passou a pagar' : 'Economias de quem passou a pagar', r => r ? td(S.inVal[r], fs) : '<td></td>'],
-    ['Matrículas que deixaram de pagar', r => r ? `<td>${fi(eco.outMat[r])}</td>` : '<td></td>'],
-    [money ? 'Faturamento de quem deixou de pagar' : 'Economias de quem deixou de pagar', r => r ? td(-S.outVal[r], fs) : '<td></td>'],
-    ['Ajuste em quem já pagava', r => r ? td(S.stock[r] - S.stock[r - 1] - S.inVal[r] + S.outVal[r], fs) : '<td></td>'],
-    ['Acumulado desde ' + first, r => r ? td(S.stock[r] - S.stock[0], fs) : '<td></td>'],
-    ['Matrículas com divergência', r => `<td class="${eco.divMat[r] ? 'warn' : ''}">${fi(eco.divMat[r])}</td>`]
-  ];
-  $('#tblMes').innerHTML = `<table><thead><tr><th></th>${labels.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>` +
-    rows.map(([n, fn]) => `<tr><td>${n}</td>${labels.map((_, r) => fn(r)).join('')}</tr>`).join('') + '</tbody></table>';
+  const head = `<thead><tr><th></th>${labels.map((l, r) => `<th>${l}${r ? '' : ' (base)'}</th>`).join('')}<th class="tot">Total 2026</th></tr></thead>`;
+  const row = (name, get, opt = {}) => {
+    let h = `<tr class="${opt.cls || ''}"><td>${name}</td>`, t = 0;
+    for (let r = 0; r < nR; r++){
+      if (!r && !opt.base){ h += '<td></td>'; continue; }
+      const v = get(r); if (r) t += v;
+      h += `<td class="${opt.color || ''}">${opt.f(v)}</td>`;
+    }
+    return h + `<td class="tot ${opt.color || ''}">${opt.total === false ? '' : opt.f(opt.total != null ? opt.total : t)}</td></tr>`;
+  };
+  const e0 = v => nf0.format(v), ep = v => (v > 0 ? '+' : '') + nf0.format(v), r0 = v => brl0.format(v);
+  let acc2 = 0;
+  $('#tblMes').innerHTML = `<table>${head}<tbody>` +
+    row('Economias que passaram a faturar esgoto', r => ent[r], { f: ep, color: 'pos', cls: 'strong' }) +
+    row('Pela troca de AGUA para AGUA E ESGOTO', r => o.nov[r], { f: ep, cls: 'sub' }) +
+    row('Por aumento em quem já pagava', r => o.aum[r], { f: ep, cls: 'sub' }) +
+    row('Acumulado em 2026', r => (acc2 += ent[r]), { f: e0, total: false }) +
+    row('Faturamento de esgoto das novas economias', r => fEnt[r], { f: r0, color: 'pos' }) +
+    row('Faturamento de esgoto total do mês', r => o.fatTot[r], { f: r0, base: true, total: false }) +
+    row('Economias com esgoto faturadas no mês', r => o.ecoTot[r], { f: e0, base: true, total: false }) +
+    '</tbody></table>';
 
-  const A = money ? D.fe : D.qe;
-  segTable($('#tblSub'), k, D.sub, D.dict.sub, A, money, 'Sub-categoria', 'sortSub');
-  segTable($('#tblCid'), k, D.cid, D.dict.cid, A, money, 'Cidade', 'sortCid');
-  const txt = `Base em ${first}, variação de cada mês contra o anterior e total de 2026 (${last} menos ${first}). Passaram e deixaram: matrículas que trocaram de tipo de faturamento entre ${first} e ${last}.`;
-  $('#lSub').textContent = txt; $('#lCid').textContent = txt + ' Clique nos títulos para ordenar.';
+  // Para conhecimento
+  $('#tblInfo').innerHTML = `<table><thead><tr><th></th>${labels.slice(1).map(l => `<th>${l}</th>`).join('')}<th class="tot">Total 2026</th></tr></thead><tbody>` +
+    [['Deixaram de faturar esgoto (voltaram para AGUA)', o.sai], ['Redução de economias em quem continua pagando', o.red], ['Voltaram a faturar esgoto depois de sair (reentrada)', o.ree]]
+      .map(([n, a]) => `<tr><td>${n}</td>${labels.slice(1).map((_, i) => `<td>${nf0.format(a[i + 1])}</td>`).join('')}<td class="tot">${nf0.format(sumFrom1(a))}</td></tr>`).join('') +
+    '</tbody></table>';
+
+  segTable($('#tblSub'), o.subUsed, D.dict.sub, money ? o.subF : o.subE, o.subS, money, 'Sub-categoria', 'sortSub');
+  segTable($('#tblCid'), o.cidUsed, D.dict.cid, money ? o.cidF : o.cidE, o.cidS, money, 'Cidade', 'sortCid');
+  const txt = money ? 'Faturamento de esgoto das novas economias em cada mês.' : 'Economias que passaram a faturar esgoto em cada mês (troca de tipo e aumento em quem já pagava).';
+  $('#lSub').textContent = txt + ' A coluna de saídas é só para conhecimento e não é descontada.';
+  $('#lCid').textContent = txt + ' A coluna de saídas é só para conhecimento e não é descontada. Clique nos títulos para ordenar.';
   const s = D.stats;
   $('#foot').textContent = `Base: ${nf0.format(s.linhas)} linhas com ULTIMO_CONTRATO = SIM em ${s.abas.length} aba(s). ` +
-    `${nf0.format(s.naoUltimo)} linhas de contratos anteriores foram desconsideradas. Matrícula ausente em uma referência conta como sem esgoto naquele mês.` +
+    `${nf0.format(s.naoUltimo)} linhas de contratos anteriores foram desconsideradas. Cada ligação conta só na primeira vez que passa a faturar esgoto em 2026; quem já pagava em ${first} e voltou depois de sair entra como reentrada.` +
     (s.semRef ? ` ${nf0.format(s.semRef)} linhas sem referência válida foram ignoradas.` : '') +
     (s.ignoradas.length ? ` Abas sem a coluna NUM_LIGACAO, ignoradas: ${s.ignoradas.join(', ')}.` : '');
 }
-function segTable(el, k, seg, names, A, money, title, sortKey){
-  const nR = D.refs.length, L = nR - 1, labels = D.refs.map(refLabel), nS = names.length;
-  const T = bySegment(k, seg, nS, A);
-  const used = new Uint8Array(nS), yIn = new Float64Array(nS), yOut = new Float64Array(nS);
-  for (let m = 0; m < D.mats.length; m++){
-    if (!k[m]) continue;
-    const s = seg[m]; used[s] = 1;
-    if (D.yStat[m] === 2) yIn[s]++; else if (D.yStat[m] === 3) yOut[s]++;
-  }
+function segTable(el, used, names, T, S, money, title, sortKey){
+  const nR = D.refs.length, labels = D.refs.map(refLabel), nS = names.length;
   let rows = []; for (let s = 0; s < nS; s++) if (used[s]) rows.push(s);
-  const tot = s => T[s * nR + L] - T[s * nR];
-  const sk = st[sortKey] || 'tot';
+  const tot = s => { let t = 0; for (let r = 1; r < nR; r++) t += T[s * nR + r]; return t; };
   const sorters = {
     nome: (a, b) => names[a].localeCompare(names[b], 'pt-BR'),
-    base: (a, b) => T[b * nR] - T[a * nR],
     tot: (a, b) => tot(b) - tot(a),
-    in: (a, b) => yIn[b] - yIn[a],
-    out: (a, b) => yOut[b] - yOut[a]
+    out: (a, b) => S[b] - S[a]
   };
-  rows.sort(sorters[sk] || sorters.tot);
-  const f = money ? (v => brl0.format(v)) : (v => nf0.format(v));
-  const fs = money ? (v => signed(v, x => brl0.format(x))) : (v => signed(v, x => nf0.format(x)));
-  const sum = new Float64Array(nR); let sIn = 0, sOut = 0;
-  rows.forEach(s => { for (let r = 0; r < nR; r++) sum[r] += T[s * nR + r]; sIn += yIn[s]; sOut += yOut[s]; });
-  const line = (name, get, a, b, isSum) => {
-    let h = `<tr${isSum ? ' class="sum"' : ''}><td>${esc(name)}</td><td class="base">${f(get(0))}</td>`;
-    const vs = [];
-    for (let r = 1; r < nR; r++){ const v = get(r) - get(r - 1); vs.push(v); h += `<td class="${cls(v)}">${fs(v)}</td>`; }
-    const t = get(L) - get(0);
-    return h + `<td class="tot ${cls(t)}">${fs(t)}</td><td>${nf0.format(a)}</td><td>${nf0.format(b)}</td><td>${spark(vs)}</td></tr>`;
+  rows.sort(sorters[st[sortKey]] || sorters.tot);
+  const f = money ? (v => brl0.format(v)) : (v => (v > 0 ? '+' : '') + nf0.format(v));
+  const sum = new Float64Array(nR); let sS = 0;
+  rows.forEach(s => { for (let r = 1; r < nR; r++) sum[r] += T[s * nR + r]; sS += S[s]; });
+  const line = (name, get, out, isSum) => {
+    let h = `<tr${isSum ? ' class="sum"' : ''}><td>${esc(name)}</td>`, t = 0; const vs = [];
+    for (let r = 1; r < nR; r++){ const v = get(r); t += v; vs.push(v); h += `<td class="${v > 0.004 ? 'pos' : ''}">${f(v)}</td>`; }
+    return h + `<td class="tot ${t > 0.004 ? 'pos' : ''}">${f(t)}</td><td class="base">${nf0.format(out)}</td><td>${spark(vs)}</td></tr>`;
   };
   const th = (key, text, extra) => `<th class="sortable${extra ? ' ' + extra : ''}" data-sort="${key}" data-key="${sortKey}">${text}</th>`;
-  el.innerHTML = `<table><thead><tr>${th('nome', title)}${th('base', labels[0] + ' (base)')}
+  el.innerHTML = `<table><thead><tr>${th('nome', title)}
       ${labels.slice(1).map(l => `<th>${l}</th>`).join('')}
-      ${th('tot', 'Total 2026', 'tot')}${th('in', 'Passaram')}${th('out', 'Deixaram')}<th>Tendência</th></tr></thead><tbody>` +
-    rows.map(s => line(names[s] || '(vazio)', r => T[s * nR + r], yIn[s], yOut[s])).join('') +
-    line('Total', r => sum[r], sIn, sOut, true) + '</tbody></table>';
+      ${th('tot', 'Total 2026', 'tot')}${th('out', 'Saídas (conhecimento)')}<th>Tendência</th></tr></thead><tbody>` +
+    rows.map(s => line(names[s] || '(vazio)', r => T[s * nR + r], S[s])).join('') +
+    line('Total', r => sum[r], sS, true) + '</tbody></table>';
 }
 
 /* ---------- Consolidado ---------- */
-const YSTAT = ['Sem esgoto', 'Manteve esgoto', 'Passou a pagar', 'Deixou de pagar'];
+const YSTAT = ['Sem esgoto', 'Já pagava', 'Passou a faturar em 2026', 'Deixou de faturar em 2026'];
 const YCLS = ['', '', 'pos', 'neg'];
 function buildChips(){
   $('#chips').innerHTML = FIELDS.map(f => `<button type="button" class="chip" data-f="${f.k}" aria-pressed="${visible.has(f.k)}">${f.l}</button>`).join('');
@@ -959,7 +1031,7 @@ function consList(){
     let ok = true;
     switch (mov){
       case 'entrou_ano': ok = D.yStat[m] === 2; break;
-      case 'saiu_ano': ok = D.yStat[m] === 3; break;
+      case 'saiu_ano': ok = D.anyOut[m] === 1; break;
       case 'entrou_mes': ok = any(m, 1); break;
       case 'saiu_mes': ok = any(m, 0); break;
       case 'diverg': ok = mes < 0 ? D.divN[m] > 0 : D.div[m * nR + mes] > 0; break;
@@ -1028,7 +1100,7 @@ function renderCons(recalc){
 async function exportCsv(){
   const list = st.list || consList(), nR = D.refs.length, labels = D.refs.map(refLabel);
   if (!list.length){ toast('Não há matrículas para exportar com esses filtros.'); return; }
-  overlay(true, 'Gerando o CSV', `${nf0.format(list.length)} matrículas`, 0);
+  bloqueia(true); prog(true, 'Gerando o CSV', `${nf0.format(list.length)} matrículas`, 0);
   const q = s => { s = String(s); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const head = ['NUM_LIGACAO', 'NOM_CLIENTE', 'CIDADE', 'SUB_CATEGORIA', 'SIT_LIG', 'SIT_CONTRATO', 'ESGOTO_2026'];
   labels.forEach(l => FIELDS.forEach(f => head.push(`${f.h} ${l}`)));
@@ -1048,13 +1120,13 @@ async function exportCsv(){
       chunk += row.join(';') + '\r\n';
     }
     parts.push(chunk);
-    overlay(true, null, null, i / list.length);
+    prog(true, null, null, i / list.length);
     await new Promise(r => setTimeout(r));
   }
   const url = URL.createObjectURL(new Blob(parts, { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a'); a.href = url; a.download = 'consolidado_esgoto.csv'; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
-  overlay(false);
+  prog(false); bloqueia(false);
 }
 
 /* ---------- navegação ---------- */
@@ -1068,11 +1140,55 @@ function showTab(t){
 function refresh(){ if (!D) return; st.list = null; if (st.tab === 'resumo') renderResumo(); else renderCons(true); }
 
 $('#btnFiles').onclick = () => $('#inFiles').click();
-$('#btnFolder').onclick = () => $('#inFolder').click();
+let pasta = null;
+const temPicker = 'showDirectoryPicker' in window;
+function mostraFonte(){
+  $('#fonte').innerHTML = pasta ? `📁 Pasta conectada: <b>${esc(pasta.name)}</b>. Clique em ↻ Atualizar para ler os arquivos de novo.`
+    : temPicker ? 'Nenhuma pasta conectada.' : 'Este navegador não lembra a pasta: use o Chrome ou o Edge para conectar e atualizar com um clique.';
+  $('#btnUpdate').hidden = !pasta;
+  $('#btnUpdate').classList.toggle('primary', !!pasta);
+  $('#btnFolder').classList.toggle('primary', !pasta);
+}
+async function coletaXlsx(dir, out){
+  for await (const [nome, e] of dir.entries()){
+    if (e.kind === 'file'){ if (/\.xlsx$/i.test(nome) && !nome.startsWith('~$')) out.push(await e.getFile()); }
+    else await coletaXlsx(e, out);
+  }
+}
+async function lePasta(h){
+  if (rodando) return;
+  try {
+    if ((await h.queryPermission({ mode: 'read' })) !== 'granted' && (await h.requestPermission({ mode: 'read' })) !== 'granted'){
+      progErro('O acesso à pasta não foi liberado.', 'Clique em ↻ Atualizar e permita a leitura quando o navegador perguntar.'); return;
+    }
+    bloqueia(true);
+    prog(true, 'Lendo a pasta…', `Procurando os arquivos .xlsx em “${h.name}”.`, 0);
+    const files = []; await coletaXlsx(h, files);
+    bloqueia(false);
+    loadFiles(files, `pasta “${h.name}”`);
+  } catch (e){
+    if (e && (e.name === 'NotFoundError' || e.name === 'NotReadableError'))
+      progErro(`A pasta “${h.name}” não foi encontrada.`, 'Ela pode ter mudado de nome ou de lugar. Clique em 📁 Conectar pasta e escolha de novo.');
+    else progErro('Não foi possível ler a pasta.', String(e && e.message || e));
+  }
+}
+async function conectaPasta(){
+  if (rodando) return;
+  if (!temPicker){ $('#inFolder').click(); return; }
+  let h;
+  try { h = await window.showDirectoryPicker({ id: 'esgoto2026', mode: 'read' }); }
+  catch (e){ if (e && e.name !== 'AbortError') progErro('Não foi possível abrir a pasta.', String(e.message || e)); return; }
+  pasta = h;
+  try { await idbSavePasta(h); } catch (_) {}
+  mostraFonte();
+  lePasta(h);
+}
+$('#btnFolder').onclick = conectaPasta;
+$('#btnUpdate').onclick = () => { if (pasta) lePasta(pasta); };
 $('#inFiles').onchange = e => { loadFiles(e.target.files); e.target.value = ''; };
-$('#inFolder').onchange = e => { loadFiles(e.target.files); e.target.value = ''; };
+$('#inFolder').onchange = e => { const f = e.target.files; const nome = f.length && f[0].webkitRelativePath ? f[0].webkitRelativePath.split('/')[0] : 'pasta'; loadFiles(f, `pasta “${nome}”`); e.target.value = ''; };
 $('#btnClear').onclick = async () => {
-  if (!confirm('Apagar a base guardada neste navegador? Os arquivos no seu computador não são afetados.')) return;
+  if (!confirm('Apagar a base guardada neste navegador e desconectar a pasta? Os arquivos no seu computador não são afetados.')) return;
   try { await idbClear(); } catch (_) {}
   location.reload();
 };
@@ -1110,6 +1226,8 @@ drop.addEventListener('drop', e => loadFiles(e.dataTransfer.files));
 // abre com a última base guardada
 (async () => {
   try {
+    try { pasta = await idbLoadPasta() || null; } catch (_) { pasta = null; }
+    mostraFonte();
     const d = await idbLoad();
     if (d && d.refs) setData(d);
   } catch (_) {}
